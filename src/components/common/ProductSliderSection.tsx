@@ -1,0 +1,172 @@
+// src/components/common/ProductSliderSection.tsx
+"use client";
+
+import React, { useCallback, useEffect, useState, useRef } from "react";
+import Link from "next/link";
+import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react";
+
+import ProductCard from "@/components/product/ProductCard"; // Adjust path if needed
+import MouseFollowTooltip from "@/components/common/MouseFollowTooltip"; // Adjust path if needed
+import { Product } from "@/types"; // Ensure this type path is correct
+
+
+interface ProductSliderSectionProps {
+  title: string;
+  products: Product[];
+  viewAllLink: string;
+  viewAllText?: string;
+  emblaOptions?: EmblaOptionsType;
+  showDragTooltip?: boolean;
+}
+
+const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
+  title,
+  products = [],
+  viewAllLink,
+  viewAllText = "View all",
+  emblaOptions,
+  showDragTooltip = true,
+}) => {
+  // --- Tooltip State & Refs ---
+  const [isHoveringSlider, setIsHoveringSlider] = useState(false);
+  const tooltipRef = useRef<HTMLSpanElement>(null);
+
+  // --- Embla Configuration ---
+  const defaultOptions: EmblaOptionsType = {
+    loop: false,
+    align: "start",
+    containScroll: "trimSnaps",
+    dragFree: true,
+  };
+  const options = { ...defaultOptions, ...emblaOptions };
+  const [emblaRef, emblaApi] = useEmblaCarousel(options);
+  // We don't need prev/next state if we remove the buttons
+  // const [canScrollPrev, setCanScrollPrev] = useState(false);
+  // const [canScrollNext, setCanScrollNext] = useState(false);
+
+  // We don't need these callbacks if we remove the buttons
+  // const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  // const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+  // Keep onSelect if you might add other indicators later, otherwise optional
+  // const onSelect = useCallback(() => {
+  //   if (!emblaApi) return;
+  //   setCanScrollPrev(emblaApi.canScrollPrev());
+  //   setCanScrollNext(emblaApi.canScrollNext());
+  // }, [emblaApi]);
+
+  // Keep useEffect if you might add other indicators later, otherwise optional
+  // useEffect(() => {
+  //   if (!emblaApi) return;
+  //   onSelect();
+  //   emblaApi.on("select", onSelect);
+  //   emblaApi.on("reInit", onSelect);
+  //   return () => {
+  //     emblaApi?.off("select", onSelect);
+  //     emblaApi?.off("reInit", onSelect);
+  //   };
+  // }, [emblaApi, onSelect]);
+  // --- End Embla Setup ---
+
+  // --- Tooltip Event Handlers ---
+  const handleMouseMove = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (tooltipRef.current && isHoveringSlider) {
+        const xOffset = 15;
+        const yOffset = 10;
+        tooltipRef.current.style.transform = `translate(${
+          event.clientX + xOffset
+        }px, ${event.clientY + yOffset}px)`;
+      }
+    },
+    [isHoveringSlider]
+  );
+
+  const handleMouseEnter = useCallback(() => {
+    if (window.innerWidth >= 1024 && showDragTooltip) {
+      // lg breakpoint
+      setIsHoveringSlider(true);
+    }
+  }, [showDragTooltip]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (showDragTooltip) {
+      setIsHoveringSlider(false);
+    }
+  }, [showDragTooltip]);
+  // --- End Tooltip Event Handlers ---
+
+  if (!products || products.length === 0) return null;
+
+  return (
+    <section className="bg-white py-10 lg:py-16 overflow-hidden">
+      {/* Section Header */}
+      <header className="mb-6 lg:mb-10">
+        <div className="w-full px-4 lg:px-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
+          <h3 className="text-3xl lg:text-4xl xl:text-5xl font-medium text-black mb-4 lg:mb-0">
+            {title}
+          </h3>
+          {/* Desktop Controls: Only View All Button */}
+          <div className="hidden lg:flex items-center">
+            {" "}
+            {/* View All Button */}
+            <Link href={viewAllLink} passHref>
+              <button
+                type="button"
+                className="bg-black text-white text-xs font-medium py-2 px-4 rounded-sm hover:bg-gray-800 transition-colors whitespace-nowrap"
+              >
+                {viewAllText}
+              </button>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Embla Carousel Container with Tooltip Listeners */}
+      <div
+        className="embla pl-4 lg:pl-10 cursor-grab active:cursor-grabbing" // Left padding for alignment
+        ref={emblaRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onMouseMove={handleMouseMove}
+      >
+        <div className="embla__container">
+          {products.map((product, index) => (
+            // Responsive widths using Tailwind classes + padding-right for gap
+            <div
+              key={product.id || `product-${index}`}
+              className="embla__slide pr-3 md:pr-4 lg:pr-5 xl:pr-6 w-10/12 sm:w-1/2 md:w-[40%] lg:w-[30%] xl:w-1/4 2xl:w-1/5"
+            >
+              <div className="h-full">
+                <ProductCard product={product} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mobile View All Button */}
+      <div className="px-4 lg:px-10 mt-8 lg:hidden">
+        <Link href={viewAllLink} passHref>
+          <button
+            type="button"
+            className="w-full text-center block bg-black text-white text-sm font-medium py-3 px-5 rounded-sm hover:bg-gray-800 transition-colors"
+          >
+            {viewAllText}
+          </button>
+        </Link>
+      </div>
+
+      {/* Tooltip */}
+      {showDragTooltip && (
+        <MouseFollowTooltip
+          ref={tooltipRef}
+          text="CLICK & DRAG" // Uppercase text
+          isVisible={isHoveringSlider}
+        />
+      )}
+    </section>
+  );
+};
+
+export default ProductSliderSection;

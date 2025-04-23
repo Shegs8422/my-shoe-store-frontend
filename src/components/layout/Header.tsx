@@ -15,62 +15,7 @@ const GlobeIcon = () => (
     <circle cx="5" cy="5" r="4.5" />
   </svg>
 );
-const SearchIcon = () => (
-  <svg
-    className="w-4 h-4"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    fill="none"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-  </svg>
-);
-const UserIcon = () => (
-  <svg
-    className="w-4 h-4"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    fill="none"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-    <circle cx="12" cy="7" r="4"></circle>
-  </svg>
-);
-const HeartIcon = () => (
-  <svg
-    className="w-4 h-4"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    fill="none"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-  </svg>
-);
-const ShoppingBagIcon = () => (
-  <svg
-    className="w-4 h-4"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    fill="none"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <path d="M16 10a4 4 0 0 1-8 0"></path>
-  </svg>
-);
+
 const MenuIcon = () => (
   <svg
     className="w-6 h-6"
@@ -139,11 +84,13 @@ const Header = () => {
     hover:text-primary
     after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300
     hover:after:w-full
+    font-helvetica-compressed
   `;
   const utilityLinkClasses = `
     text-white text-xs font-medium uppercase tracking-wider
     hover:opacity-80 transition-opacity duration-150
     flex items-center gap-1.5
+    font-helvetica-compressed
   `;
   // --- End Base Classes ---
 
@@ -164,7 +111,7 @@ const Header = () => {
         )}
         aria-label="Main Navigation"
       >
-        <div className="container mx-auto w-full">
+        <div className="container mx-auto px-4 lg:px-6 w-full">
           <nav className="flex justify-between items-center w-full h-full">
             {/* Logo */}
             <div className="flex-shrink-0 z-10">
@@ -183,7 +130,7 @@ const Header = () => {
             {/* Main Navigation (Desktop) - Centered */}
             <ul className="group/mainnav hidden lg:flex flex-row items-center justify-center gap-6 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <li className="group/dropdown-menu relative">
-                <Link href="/pages/shop/page.tsx" className={navLinkClasses}>
+                <Link href="/pages/shop" className={navLinkClasses}>
                   Shop
                 </Link>
                 <div className="absolute top-full left-0 pt-5 group-hover/dropdown-menu:pointer-events-auto">
@@ -200,7 +147,10 @@ const Header = () => {
                       shadow-xl
                     "
                   >
-                    <MegaMenu links={shopLinks} />
+                    <MegaMenu
+                      links={shopLinks}
+                      className="font-helvetica-compressed"
+                    />
                   </div>
                 </div>
               </li>
@@ -222,7 +172,10 @@ const Header = () => {
                       shadow-xl
                     "
                   >
-                    <MegaMenu links={exclusiveLinks} />
+                    <MegaMenu
+                      links={exclusiveLinks}
+                      className="font-helvetica-compressed"
+                    />
                   </div>
                 </div>
               </li>
@@ -244,7 +197,10 @@ const Header = () => {
                       shadow-xl
                     "
                   >
-                    <MegaMenu links={communityLinks} />
+                    <MegaMenu
+                      links={communityLinks}
+                      className="font-helvetica-compressed"
+                    />
                   </div>
                 </div>
               </li>
@@ -269,7 +225,10 @@ const Header = () => {
                       shadow-xl
                     "
                   >
-                    <MegaMenu links={ss25Links} />
+                    <MegaMenu
+                      links={ss25Links}
+                      className="font-helvetica-compressed"
+                    />
                   </div>
                 </div>
               </li>
