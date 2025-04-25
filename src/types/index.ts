@@ -18,27 +18,36 @@ export type ProductPrice = {
   currencyCode: string; // e.g., "EUR", "USD"
 };
 
-export type Product = {
-  id: string; // Essential for keys
-  handle: string; // Essential for links
-  title: string; // Essential for display
-  vendor?: string; // Optional but common
-  description?: string; // Optional
-  images: ProductImage[]; // **Required** (at least one) for ProductCard
-  variants: ProductVariant[]; // **Required** (at least one) for ProductCard/logic
-  price: ProductPrice; // Main display price (often the min variant price)
-  // Optional fields often used for display/logic:
-  options?: { name: string; values: string[] }[]; // e.g., { name: 'Size', values: ['S', 'M'] }
-  featuredImage?: ProductImage; // Often same as images[0]
-  hoverImageUrl?: string; // Optional for hover effect
-  colorName?: string; // Optional for display
-  isNew?: boolean; // Optional for 'New' badge
-  isSoldOut?: boolean; // Optional for 'Sold Out' state (often derived from variants)
-  comingSoon?: boolean; // Optional for 'Coming Soon' badge
-  isOnlineExclusive?: boolean; // Optional for 'Online Exclusive' badge
-  tags?: string[]; // Optional
-  // Add any other fields coming from your backend (Vendure)
-};
+export interface Product {
+  id: string;
+  handle: string;
+  vendor?: string;
+  title: string;
+  colorName?: string;
+  price: {
+    amount: number;
+    currencyCode: string;
+  };
+  images?: Array<{
+    src: string;
+    alt: string;
+  }>;
+  variants?: Array<{
+    id: string;
+    price: number;
+    available: boolean;
+    title: string;
+  }>;
+  isNew?: boolean;
+  isSoldOut?: boolean;
+  comingSoon?: boolean;
+  isOnlineExclusive?: boolean;
+  featuredImage?: {
+    src: string;
+    alt: string;
+  };
+  hoverImageUrl?: string;
+}
 
 // Keep LegacyProduct if still needed by FeaturedCollection
 export type LegacyProduct = {
@@ -52,3 +61,10 @@ export type LegacyProduct = {
   isSoldOut?: boolean;
   isNew?: boolean;
 };
+
+export interface NavLink {
+  label: string;
+  href: string;
+  badge?: string | null;
+  isNew?: boolean;
+}

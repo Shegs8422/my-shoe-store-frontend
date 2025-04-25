@@ -1,6 +1,5 @@
 // tailwind.config.ts
 import type { Config } from "tailwindcss";
-const defaultTheme = require("tailwindcss/defaultTheme");
 
 const config: Config = {
   content: [
@@ -9,16 +8,37 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    fontFamily: {
+      // Set default sans font to Helvetica
+      sans: ["Helvetica", "system-ui", "sans-serif"],
+      // Variants
+      helvetica: ["Helvetica", "system-ui", "sans-serif"],
+      "helvetica-condensed": ["Helvetica Condensed", "system-ui", "sans-serif"],
+      "helvetica-compressed": [
+        "Helvetica Compressed",
+        "system-ui",
+        "sans-serif",
+      ],
+      "helvetica-ultra": [
+        "Helvetica Ultra Compressed",
+        "system-ui",
+        "sans-serif",
+      ],
+    },
     extend: {
-      fontFamily: {
-        // Keep 'sans' for your default readable font stack
-        sans: ["Inter", ...defaultTheme.fontFamily.sans], // Or whatever your base font should be
-
-        // Add your custom font using the CSS variable from layout.tsx
-        "helvetica-compressed": [
-          "var(--font-helvetica-compressed)",
-          "sans-serif",
-        ],
+      animation: {
+        marquee: "marquee 25s linear infinite",
+      },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+      },
+      fontWeight: {
+        normal: "400",
+        medium: "500",
+        bold: "700",
       },
       borderRadius: {
         // Keep your custom border radius
@@ -34,4 +54,5 @@ const config: Config = {
   },
   plugins: [],
 };
+
 export default config;

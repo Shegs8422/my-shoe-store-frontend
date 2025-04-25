@@ -1,6 +1,7 @@
 // src/components/layout/MegaMenu.tsx
 import React from "react";
 import Link from "next/link";
+import clsx from "clsx";
 
 type MenuLink = {
   label: string;
@@ -9,15 +10,24 @@ type MenuLink = {
 
 interface MegaMenuProps {
   links: MenuLink[];
+  className?: string;
 }
 
-const MegaMenu: React.FC<MegaMenuProps> = ({ links }) => {
+const MegaMenu: React.FC<MegaMenuProps> = ({ links, className }) => {
   // Apply base faded style on list hover, full opacity on item hover
-  const linkStyle = `
-    block py-1.5 text-black text-xs font-medium uppercase leading-none tracking-wider whitespace-nowrap
-    transition-opacity duration-150 ease-out
-    group-hover/megamenu:opacity-40 hover:!opacity-100
-  `; // Using !important on hover override might be needed
+  const linkStyle = clsx(
+    // Base styles
+    "block py-1.5",
+    "text-black text-xs font-medium uppercase leading-none tracking-wider whitespace-nowrap",
+    "font-helvetica-condensed",
+
+    // Transitions
+    "transition-opacity duration-150 ease-out",
+    "group-hover/megamenu:opacity-40 hover:!opacity-100",
+
+    // Additional classes passed in
+    className
+  );
 
   return (
     // Added 'isolate' class here
