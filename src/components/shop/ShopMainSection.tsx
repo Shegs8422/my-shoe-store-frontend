@@ -1,67 +1,69 @@
 import React from "react";
 import Image from "next/image";
-import Link from "next/link"; // Import Link
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 
-// Reusable Card Component
+interface CategoryCardProps {
+  imageUrl: string;
+  altText: string;
+  tag: string;
+  titleLines: string | string[];
+}
+
 const CategoryCard = ({
   imageUrl,
   altText,
   tag,
   titleLines,
-  className = "",
-  imageClassName = "",
-  tagPosition = "top-right", // "top-right" or "bottom-left" (for the long title)
-  titlePosition = "bottom-left",
-}) => {
-  const isMultiLineTitle = Array.isArray(titleLines);
+}: CategoryCardProps) => {
+  const lines = Array.isArray(titleLines) ? titleLines : [titleLines];
 
   return (
-    <div className={`relative w-full overflow-hidden group ${className}`}>
-      {/* Image */}
-      <div className={`relative w-full h-full ${imageClassName}`}>
+    <div className="relative h-full w-full overflow-hidden">
+      {/* Image Container with explicit aspect ratio */}
+      <div
+        className="relative h-full w-full"
+        style={{ aspectRatio: "337/410" }} // Match original aspect ratio
+      >
         <Image
           src={imageUrl}
           alt={altText}
-          fill // Use fill to cover the container
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 666px" // Example sizes, adjust as needed
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 666px"
+          className="object-cover transition-transform duration-700 group-hover/image-wrapper:scale-105"
+          priority
+          quality={90}
+          unoptimized={process.env.NODE_ENV === "development"} // Bypass optimization in dev
         />
-      </div>
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-l from-black/40 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-40 group-hover:opacity-60 transition-opacity duration-300"></div>
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 size-full bg-gradient-to-t from-black to-transparent opacity-15" />
 
-      {/* Text Content Overlay */}
-      <div className="absolute inset-0 p-5 md:p-6 lg:p-8 text-white flex flex-col justify-between">
-        {/* Tag (SS25 / mainline) */}
-        <div className="absolute top-5 right-5">
-          {/* Rotated text slightly adjusted for better positioning with Tailwind */}
-          <div className="origin-top-right transform rotate-90 translate-x-full -translate-y-1/2 whitespace-nowrap text-xs font-medium uppercase tracking-wider">
+        {/* Text Content */}
+        <div className="absolute inset-0 flex size-full justify-between p-4 lg:pb-10 lg:pl-10 lg:pr-5 lg:pt-5">
+          <h2 className="text-primary-medium-xl self-end text-white lg:text-primary-medium-2xl">
+            {lines.map((line, index) => (
+              <motion.span
+                key={index}
+                className="block"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                {line}
+              </motion.span>
+            ))}
+          </h2>
+
+          <motion.span
+            className="text-secondary-medium-xs max-h-fit max-w-fit rotate-180 text-white [writing-mode:vertical-rl] lg:text-secondary-medium-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
             {tag}
-          </div>
-        </div>
-
-        {/* Title (Tops / Knitwear / Spring Summer 25) */}
-        <div className="mt-auto">
-          {" "}
-          {/* Pushes title to the bottom */}
-          {isMultiLineTitle ? (
-            <div className="flex flex-wrap gap-x-2 items-baseline">
-              {titleLines.map((line, index) => (
-                <h2
-                  key={index}
-                  className="text-3xl md:text-4xl font-medium leading-tight"
-                >
-                  {line}
-                </h2>
-              ))}
-            </div>
-          ) : (
-            <h2 className="text-3xl md:text-4xl font-medium leading-tight">
-              {titleLines} {/* Single line title */}
-            </h2>
-          )}
+          </motion.span>
         </div>
       </div>
     </div>
@@ -69,75 +71,77 @@ const CategoryCard = ({
 };
 
 const ShopMainSection = () => {
-  const mainlineImage = "/images/spring-summer-25-main.png";
-  const knitwearImage = "/images/spring-summer-25-knitwear.png";
-  const topsImage = "/images/spring-summer-25-tops.png";
+  // Verify these paths exist in your public/images directory
+  const images = {
+    mainline: "/images/spring summer 25.webp", // Use hyphen instead of space
+    "T-Shirts": "/images/spring-summer-25-T-Shirts.webp",
+    tops: "/images/spring-summer-25-tops.webp",
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 },
+  };
 
   return (
-    // Main container: Centered, max-width, responsive grid layout
-    <div className="w-full max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-10 py-10">
-      {/*
-          Grid Setup:
-          - Default: 1 column (mobile-first)
-          - xl (1280px+): 2 columns
-          - Using grid-cols-2 implies roughly equal width columns.
-          - Gap between grid items (columns and rows if stacking)
-       */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 md:gap-4 lg:gap-5">
-        {/* Left Column Item (Mainline) */}
-        {/* Spans full height in the grid on large screens using row-span-2 */}
-        <Link
-          href="/collections/mainline"
-          className="xl:row-span-2 h-[60vh] md:h-[70vh] xl:h-auto xl:aspect-[666/811]"
+    <section className="shopify-section section_featured-links bg-white px-4 sm:px-6 lg:px-10 pb-16 lg:pb-24">
+      <AnimatePresence>
+        <motion.ul
+          className="container-content relative isolate grid h-full w-full gap-3 pb-content lg:grid-cols-2"
+          initial="hidden"
+          animate="visible"
+          transition={{ staggerChildren: 0.1 }}
         >
-          {" "}
-          {/* Responsive height/aspect ratio */}
-          <CategoryCard
-            imageUrl={mainlineImage} // Use a distinct image if available
-            altText="Mainline Spring Summer 25 Collection"
-            tag="mainline"
-            titleLines={["Spring", "Summer", "25"]}
-            // className="h-full" // Let aspect ratio define height on xl
-          />
-        </Link>
-
-        {/* Right Column Wrapper (for stacking Knitwear & Tops) */}
-        {/* On xl screens, this div sits in the second grid column. Content flows vertically */}
-        <div className="flex flex-col gap-3 md:gap-4 lg:gap-5">
-          {/* Top Right Item (Knitwear) */}
-          <Link
-            href="/collections/knitwear"
-            className="aspect-video xl:aspect-auto xl:h-auto"
+          {/* Mainline Card */}
+          <motion.li
+            className="group/image-wrapper relative aspect-[337/410] h-full max-w-full overflow-hidden lg:row-span-2"
+            variants={cardVariants}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            {" "}
-            {/* Maintain aspect ratio on smaller, let grid/flex define on xl */}
-            <CategoryCard
-              imageUrl={knitwearImage} // Use a distinct image if available
-              altText="Knitwear Collection SS25"
-              tag="SS25"
-              titleLines="Knitwear"
-              className="h-full" // Ensure card fills the container height
-            />
-          </Link>
+            <Link href="/collections/mainline" className="block h-full">
+              <CategoryCard
+                imageUrl={images.mainline}
+                altText="Mainline Spring Summer 25 Collection"
+                tag="mainline"
+                titleLines={["Spring", "Summer", "25"]}
+              />
+            </Link>
+          </motion.li>
 
-          {/* Bottom Right Item (Tops) */}
-          <Link
-            href="/collections/tops"
-            className="aspect-video xl:aspect-auto xl:h-auto"
+          {/* T-Shirts Card */}
+          <motion.li
+            className="group/image-wrapper relative aspect-[337/202] h-full max-w-full overflow-hidden lg:row-span-1"
+            variants={cardVariants}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
           >
-            {" "}
-            {/* Maintain aspect ratio on smaller, let grid/flex define on xl */}
-            <CategoryCard
-              imageUrl={topsImage} // Use a distinct image if available
-              altText="Tops Collection SS25"
-              tag="SS25"
-              titleLines="Tops"
-              className="h-full" // Ensure card fills the container height
-            />
-          </Link>
-        </div>
-      </div>
-    </div>
+            <Link href="/collections/T-Shirts" className="block h-full">
+              <CategoryCard
+                imageUrl={images["T-Shirts"]}
+                altText="T-Shirts Collection SS25"
+                tag="SS25"
+                titleLines="T-Shirts"
+              />
+            </Link>
+          </motion.li>
+
+          {/* Tops Card */}
+          <motion.li
+            className="group/image-wrapper relative aspect-[337/202] h-full max-w-full overflow-hidden lg:row-span-1"
+            variants={cardVariants}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+          >
+            <Link href="/collections/tops" className="block h-full">
+              <CategoryCard
+                imageUrl={images.tops}
+                altText="Tops Collection SS25"
+                tag="SS25"
+                titleLines="Tops"
+              />
+            </Link>
+          </motion.li>
+        </motion.ul>
+      </AnimatePresence>
+    </section>
   );
 };
 

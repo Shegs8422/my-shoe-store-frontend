@@ -34,6 +34,8 @@ export type Product = {
   colorName?: string; // Optional for display
   isNew?: boolean; // Optional for 'New' badge
   isSoldOut?: boolean; // Optional for 'Sold Out' state (often derived from variants)
+  comingSoon?: boolean; // Optional for 'Coming Soon' badge
+  isOnlineExclusive?: boolean; // Optional for 'Online Exclusive' badge
   tags?: string[]; // Optional
   // Add any other fields coming from your backend (Vendure)
 };

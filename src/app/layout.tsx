@@ -40,7 +40,7 @@ export default function RootLayout({
         {/* Base body styles */}
         <LenisProvider>
           <Header />
-          <main>{children}</main>
+          <main className="pt-20 lg:pt-24">{children}</main>
           <Footer />
         </LenisProvider>
       </body>

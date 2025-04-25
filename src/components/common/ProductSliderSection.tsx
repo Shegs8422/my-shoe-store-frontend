@@ -9,7 +9,6 @@ import ProductCard from "@/components/product/ProductCard"; // Adjust path if ne
 import MouseFollowTooltip from "@/components/common/MouseFollowTooltip"; // Adjust path if needed
 import { Product } from "@/types"; // Ensure this type path is correct
 
-
 interface ProductSliderSectionProps {
   title: string;
   products: Product[];
@@ -103,7 +102,7 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
       {/* Section Header */}
       <header className="mb-6 lg:mb-10">
         <div className="w-full px-4 lg:px-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
-          <h3 className="text-3xl lg:text-4xl xl:text-5xl font-medium text-black mb-4 lg:mb-0">
+          <h3 className="text-[64px] lg:text-[96px] leading-none tracking-tight font-medium text-black mb-4 lg:mb-0">
             {title}
           </h3>
           {/* Desktop Controls: Only View All Button */}

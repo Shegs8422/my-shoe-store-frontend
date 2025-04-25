@@ -17,13 +17,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     handle,
     title,
     vendor,
-    price, // price is now an object { amount: number, currencyCode: string }
-    images, // images is an array of { src: string, alt: string }
-    hoverImageUrl, // Still optional string
+    price,
+    images,
+    hoverImageUrl,
     isNew,
-    isSoldOut, // This might be derived from variants in real data
+    isSoldOut,
+    comingSoon,
+    isOnlineExclusive,
     colorName,
-    availableForSale, // Might also be derived from variants
     featuredImage,
   } = product;
 
@@ -43,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   // Determine effective sold out status (often based on all variants being unavailable)
   // For now, we'll use the direct `isSoldOut` prop if provided, or `availableForSale`
   // In a real app, you'd check `product.variants.every(v => !v.available)`
-  const showSoldOutBadge = isSoldOut === true || availableForSale === false;
+  const showSoldOutBadge = isSoldOut === true;
   const showNewBadge = isNew === true;
 
   return (
@@ -76,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 />
               )}
             {/* Badges Overlay */}
-            <div className="absolute top-2 left-2 flex flex-col gap-1 pointer-events-none z-[1]">
+            <div className="absolute top-2 left-2 flex flex-col gap-1.5 pointer-events-none z-[1]">
               {showNewBadge && (
                 <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-black text-white">
                   New
@@ -85,6 +86,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {showSoldOutBadge && (
                 <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-gray-500 text-white">
                   Sold out
+                </span>
+              )}
+              {comingSoon && (
+                <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-yellow-400 text-black">
+                  Coming Soon
+                </span>
+              )}
+              {isOnlineExclusive && (
+                <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-green-500 text-white">
+                  Online Exclusive
                 </span>
               )}
             </div>

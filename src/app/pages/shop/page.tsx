@@ -1,148 +1,149 @@
 // src/app/pages/shop/page.tsx
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
-import Filters from "@/components/shop/Filters";
-import ProductGrid from "@/components/shop/ProductGrid";
+import React from "react";
+import ShopMainSection from "@/components/shop/ShopMainSection";
+import NewArrivalsSection from "@/components/shop/NewArrivalsSection";
+import VideoSection from "@/components/shop/VideoSection";
 import { Product } from "@/types";
-import ShopMainSection from "@/components/shop/ShopMainSection"; // Import the new component
 
-// --- Mock Data (Keep as is) ---
-const mockProducts: Product[] = Array.from({ length: 12 }).map((_, i) => {
-  const isSoldOut = i % 5 === 0;
-  const availableForSale = !isSoldOut;
-  const primaryImageUrl = `https://placehold.co/400x500/${
-    i % 2 === 0 ? "E0E0E0" : "D0D0D0"
-  }/black?text=Shoe+${i + 1}`;
-
-  return {
-    id: `mock-${i + 1}`,
-    handle: `mock-shoe-${i + 1}`,
-    title: `Patta Awesome Mock Shoe ${i + 1}`,
-    vendor: i % 4 === 0 ? "Nike" : i % 4 === 1 ? "Adidas" : "Patta",
-    price: {
-      amount: 10000 + i * 1500,
-      currencyCode: "EUR",
-    },
+// --- Mock Data (Using the same data as homepage) ---
+const mockProducts: Product[] = [
+  {
+    id: "aj3-rare-air",
+    handle: "nike-air-jordan-3-retro-og-sp-rare-air",
+    vendor: "Jordan",
+    title: "Nike Air Jordan 3 Retro OG Sp 'Rare Air'",
+    colorName: "Black/Chile Red-Neutral Grey",
+    price: { amount: 21000, currencyCode: "EUR" },
     images: [
-      { src: primaryImageUrl, alt: `Placeholder image for Shoe ${i + 1}` },
+      { src: "/images/products/placeholder-jordan3.jpg", alt: "Shoe 1" },
+    ],
+    variants: [{ id: "v1a", price: 21000, available: true, title: "US 9" }],
+    isNew: true,
+    isSoldOut: false,
+    comingSoon: true,
+    featuredImage: {
+      src: "/images/products/placeholder-jordan3.jpg",
+      alt: "Shoe 1",
+    },
+    hoverImageUrl: "/images/products/placeholder-jordan3-hover.jpg",
+  },
+  {
+    id: "aj1-rookie",
+    handle: "nike-air-jordan-1-low-og-rookie-of-the-year",
+    vendor: "Jordan",
+    title: "Nike Air Jordan 1 Low OG 'Rookie of the year'",
+    colorName: "Yellow/Black/White",
+    price: { amount: 16000, currencyCode: "EUR" },
+    images: [
+      { src: "/images/products/placeholder-jordan1-low.jpg", alt: "Shoe 2" },
+    ],
+    variants: [{ id: "v2a", price: 16000, available: true, title: "US 10" }],
+    isNew: true,
+    isSoldOut: false,
+    isOnlineExclusive: true,
+    featuredImage: {
+      src: "/images/products/placeholder-jordan1-low.jpg",
+      alt: "Shoe 2",
+    },
+    hoverImageUrl: "/images/products/placeholder-jordan1-low-hover.jpg",
+  },
+  {
+    id: "adidas-clot-gazelle",
+    handle: "adidas-clot-gazelle-cream-white",
+    vendor: "Adidas",
+    title: "adidas Clot Gazelle Shoes by Edison Chen 'Cream White'",
+    colorName: "Cream White/Black",
+    price: { amount: 16000, currencyCode: "EUR" },
+    images: [
+      { src: "/images/products/placeholder-gazelle.jpg", alt: "Gazelle" },
+    ],
+    variants: [{ id: "v4a", price: 16000, available: true, title: "US 9" }],
+    isNew: true,
+    isSoldOut: false,
+    featuredImage: {
+      src: "/images/products/placeholder-gazelle.jpg",
+      alt: "Gazelle",
+    },
+    hoverImageUrl: "/images/products/placeholder-gazelle-hover.jpg",
+  },
+  {
+    id: "nb-990v6-grey",
+    handle: "new-balance-990v6-made-in-usa-grey",
+    vendor: "New Balance",
+    title: "New Balance 990v6 Made in USA 'Grey'",
+    colorName: "Grey/Navy",
+    price: { amount: 22000, currencyCode: "EUR" },
+    images: [
+      { src: "/images/products/placeholder-nb990v6.jpg", alt: "NB 990v6 Grey" },
+    ],
+    variants: [
+      { id: "v-990v6-10", price: 22000, available: true, title: "US 10" },
+    ],
+    isNew: true,
+    isSoldOut: false,
+    featuredImage: {
+      src: "/images/products/placeholder-nb990v6.jpg",
+      alt: "NB 990v6 Grey",
+    },
+    hoverImageUrl: "/images/products/placeholder-nb990v6-hover.jpg",
+  },
+  {
+    id: "nike-vomero-5-sail",
+    handle: "nike-zoom-vomero-5-sail-light-orewood",
+    vendor: "Nike",
+    title: "Nike Zoom Vomero 5 'Sail Light Orewood'",
+    colorName: "Sail/Light Orewood Brown",
+    price: { amount: 16000, currencyCode: "EUR" },
+    images: [
       {
-        src: `https://placehold.co/400x500/C0C0C0/black?text=Angle+2`,
-        alt: `Shoe ${i + 1} angle 2`,
+        src: "/images/products/placeholder-vomero5.jpg",
+        alt: "Nike Vomero 5 Sail",
       },
     ],
     variants: [
+      { id: "v-vomero-1", price: 16000, available: true, title: "US 9" },
+    ],
+    isNew: true,
+    isSoldOut: false,
+    featuredImage: {
+      src: "/images/products/placeholder-vomero5.jpg",
+      alt: "Nike Vomero 5 Sail",
+    },
+  },
+  {
+    id: "asics-gel-kayano-14-white",
+    handle: "asics-gel-kayano-14-white-pure-silver",
+    vendor: "ASICS",
+    title: "ASICS Gel-Kayano 14 'White Pure Silver'",
+    colorName: "White/Pure Silver",
+    price: { amount: 15000, currencyCode: "EUR" },
+    images: [
       {
-        id: `variant-${i}-a`,
-        available: availableForSale,
-        price: 10000 + i * 1500,
-        title: "EU 40",
-      },
-      {
-        id: `variant-${i}-b`,
-        available: i % 3 !== 0 && availableForSale,
-        price: 10000 + i * 1500,
-        title: "EU 42",
-      },
-      {
-        id: `variant-${i}-c`,
-        available: i % 2 === 0 && availableForSale,
-        price: 10000 + i * 1500,
-        title: "EU 44",
-      },
-      {
-        id: `variant-${i}-d`,
-        available: i % 4 !== 0 && availableForSale,
-        price: 10000 + i * 1500,
-        title: "EU 46",
+        src: "/images/products/placeholder-kayano14.jpg",
+        alt: "Asics Kayano 14",
       },
     ],
+    variants: [
+      { id: "v-kayano-1", price: 15000, available: false, title: "US 8" },
+    ],
+    isNew: true,
+    isSoldOut: true,
     featuredImage: {
-      src: primaryImageUrl,
-      alt: `Placeholder image for Shoe ${i + 1}`,
+      src: "/images/products/placeholder-kayano14.jpg",
+      alt: "Asics Kayano 14",
     },
-    hoverImageUrl:
-      i % 3 === 0
-        ? `https://placehold.co/400x500/A0A0A0/white?text=Hover+${i + 1}`
-        : undefined,
-    availableForSale: availableForSale,
-    isNew: i < 4,
-    isSoldOut: isSoldOut,
-    colorName:
-      i % 3 === 0 ? "Black/White" : i % 3 === 1 ? "Stadium Green" : "Beige",
-    tags: i % 2 === 0 ? ["New", "Featured"] : ["SS25"],
-  };
-});
-// --- End Mock Data ---
-
-// Define available brands and sizes
-const AVAILABLE_BRANDS = ["Nike", "Adidas", "Patta", "Mock Brand"];
-const AVAILABLE_SIZES = ["38", "39", "40", "41", "42", "43", "44", "45", "46"];
+    hoverImageUrl: "/images/products/placeholder-kayano14-hover.jpg",
+  },
+];
 
 export default function ShopPage() {
-  // === State ===
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(mockProducts);
-
-  // === Filter Handlers ===
-  const handleBrandChange = (brand: string, isChecked: boolean) => {
-    setSelectedBrands((prev) =>
-      isChecked ? [...prev, brand] : prev.filter((b) => b !== brand)
-    );
-  };
-
-  const handleSizeChange = (size: string) => {
-    setSelectedSizes((prev) =>
-      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
-    );
-  };
-
-  const handleClearFilters = () => {
-    setSelectedBrands([]);
-    setSelectedSizes([]);
-  };
-
-  // === Filtering Logic ===
-  const productsToDisplay = useMemo(() => {
-    return mockProducts.filter((product) => {
-      const brandMatch =
-        selectedBrands.length === 0 || selectedBrands.includes(product.vendor);
-
-      const sizeMatch =
-        selectedSizes.length === 0 ||
-        product.variants.some((variant) =>
-          selectedSizes.includes(variant.title.replace("EU ", ""))
-        );
-
-      return brandMatch && sizeMatch;
-    });
-  }, [selectedBrands, selectedSizes]);
-
   return (
     <div>
-      <ShopMainSection /> {/* Render the new component */}
-      <div className="container mx-auto px-4 lg:px-6 py-8 lg:py-12">
-        <h1 className="text-3xl lg:text-4xl font-semibold mb-6 lg:mb-8">
-          Shop Footwear
-        </h1>
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
-          <aside className="w-full lg:w-1/4 xl:w-1/5 flex-shrink-0">
-            <Filters
-              availableBrands={AVAILABLE_BRANDS}
-              selectedBrands={selectedBrands}
-              onBrandChange={handleBrandChange}
-              availableSizes={AVAILABLE_SIZES}
-              selectedSizes={selectedSizes}
-              onSizeChange={handleSizeChange}
-              onClearFilters={handleClearFilters}
-            />
-          </aside>
-          <section className="w-full">
-            <ProductGrid products={productsToDisplay} />
-          </section>
-        </div>
-      </div>
+      <ShopMainSection />
+      <NewArrivalsSection products={mockProducts} />
+      <VideoSection />
     </div>
   );
 }

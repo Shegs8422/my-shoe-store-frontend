@@ -1,7 +1,7 @@
 // src/components/layout/Header.tsx
 "use client"; // This component uses hooks and browser APIs
 
-import React, { useState } from "react"; // Import useState for mobile menu
+import React, { useState, useEffect } from "react"; // Import useState for mobile menu
 import Link from "next/link";
 import Image from "next/image";
 import MegaMenu from "./MegaMenu"; // Adjust path if needed
@@ -34,8 +34,46 @@ const MenuIcon = () => (
 // --- End Placeholder Icons ---
 
 const Header = () => {
-  const { scrollDirection, isScrolledDown } = useLenisScroll(); // Use the new hook to get Lenis-driven scroll data
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile
+  const [hidden, setHidden] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      const currentScrollPosition = window.scrollY;
+
+      if (currentScrollPosition > scrollPosition) {
+        // Scrolling down
+        setHidden(true);
+      } else {
+        // Scrolling up
+        setHidden(false);
+      }
+
+      setScrollPosition(currentScrollPosition);
+
+      // Clear the timeout if it exists
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      // Set a timeout to show the header after 3 seconds of inactivity
+      timeoutId = setTimeout(() => {
+        setHidden(false);
+      }, 3000);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [scrollPosition]);
 
   // --- Link Data ---
   const shopLinks = [
@@ -100,14 +138,12 @@ const Header = () => {
     <>
       <header
         className={clsx(
-          "fixed top-0 left-0 right-0 z-30 h-20 lg:h-24",
+          "fixed top-0 left-0 right-0 z-100 h-20 lg:h-24",
           "flex items-center",
           "bg-transparent", // This ensures the header background is transparent
           "mix-blend-difference",
           "transition-transform duration-300 ease-out-cubic",
-          scrollDirection === "down" && isScrolledDown
-            ? "-translate-y-full"
-            : "translate-y-0"
+          hidden ? "-translate-y-full" : "translate-y-0"
         )}
         aria-label="Main Navigation"
       >
