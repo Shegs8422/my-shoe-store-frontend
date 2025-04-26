@@ -21,15 +21,15 @@ const VideoSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white text-center px-4">
-        <h2 className="text-5xl md:text-7xl font-bold mb-4">
+      <div className="relative z-10 flex flex-col items-start justify-end h-full text-white text-left px-6 pb-16 max-w-2xl">
+        <span className="mb-2 text-xs font-bold tracking-widest uppercase font-helvetica-condensed">
+          Available Now
+        </span>
+        <h2 className="text-4xl md:text-6xl font-bold mb-4 font-helvetica">
           Spring Summer 2025
         </h2>
-        <p className="text-xl md:text-2xl mb-8">
-          Experience the future of footwear
-        </p>
-        <button className="bg-white text-black px-8 py-3 rounded-full text-lg font-medium hover:bg-gray-100 transition-colors">
-          Shop Collection
+        <button className="bg-white text-black px-6 py-2 rounded font-helvetica-condensed text-sm font-semibold uppercase tracking-wider hover:bg-gray-100 transition-colors">
+          Shop Now
         </button>
       </div>
     </section>

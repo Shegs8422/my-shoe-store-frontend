@@ -23,14 +23,14 @@ const WalletPromo = () => {
       </div>
       <div className="flex-grow flex justify-between items-center">
         <div>
-          <p className="text-[8px] lg:text-[10px] font-medium tracking-wide leading-tight mb-0.5 text-white/80">
+          <p className="text-[8px] lg:text-[10px] font-medium tracking-wide leading-tight mb-0.5 text-white/80 font-helvetica-compressed">
             TAP & GO
           </p>
-          <p className="text-[13px] lg:text-base font-medium tracking-tight leading-tight text-white">
+          <p className="text-[13px] lg:text-base font-medium tracking-tight leading-tight text-white font-helvetica-black">
             Patta Digital Wallet
           </p>
         </div>
-        <span className="text-xs font-medium bg-white text-black py-1 px-3 rounded-sm">
+        <span className="text-xs font-medium bg-white text-black py-1 px-3 rounded-sm font-helvetica-compressed">
           OPEN
         </span>
       </div>

@@ -1,35 +1,51 @@
-import React from "react";
-import ProductCard from "../product/ProductCard";
+import React, { useState } from "react";
+import ProductCard from "@/components/product/ProductCard";
+import QuickView from "@/components/common/QuickView";
 import { Product } from "@/types";
 
 interface ProductGridProps {
   products: Product[];
-  isLoading?: boolean;
+  showQuickView?: boolean;
 }
 
 const ProductGrid: React.FC<ProductGridProps> = ({
   products,
-  isLoading = false,
+  showQuickView = true,
 }) => {
-  if (isLoading) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const handleQuickView = (product: Product) => {
+    setSelectedProduct(product);
+  };
+
+  if (!products || products.length === 0) {
     return (
-      <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-8">
-        {[...Array(8)].map((_, index) => (
-          <div key={index} className="animate-pulse">
-            <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200" />
-            <div className="mt-4 h-4 w-3/4 rounded bg-gray-200" />
-            <div className="mt-2 h-4 w-1/2 rounded bg-gray-200" />
-          </div>
-        ))}
+      <div className="col-span-full text-center py-10 text-gray-500">
+        <p>No products found matching your criteria.</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-8">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6">
+      {products.map((product, index) => (
+        <ProductCard
+          key={product.id}
+          product={product}
+          priority={index < 4}
+          showQuickView={showQuickView}
+          onQuickView={handleQuickView}
+        />
       ))}
+
+      {/* Quick View Modal */}
+      {selectedProduct && (
+        <QuickView
+          isOpen={!!selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          product={selectedProduct}
+        />
+      )}
     </div>
   );
 };

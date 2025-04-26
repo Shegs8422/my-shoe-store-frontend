@@ -1,8 +1,9 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/components/product/ProductCard";
 import ProductButton from "@/components/common/ProductButton";
+import QuickView from "@/components/common/QuickView";
 import { Product } from "@/types";
 
 interface FeaturedCollectionProps {
@@ -24,6 +25,14 @@ const FeaturedCollection = forwardRef<HTMLElement, FeaturedCollectionProps>(
     },
     ref
   ) => {
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(
+      null
+    );
+
+    const handleQuickView = (product: Product) => {
+      setSelectedProduct(product);
+    };
+
     return (
       <section
         ref={ref}
@@ -68,6 +77,7 @@ const FeaturedCollection = forwardRef<HTMLElement, FeaturedCollectionProps>(
                     product={product}
                     priority={index < 2}
                     showQuickView={showQuickView}
+                    onQuickView={handleQuickView}
                   />
                 ))}
               </div>
@@ -80,6 +90,15 @@ const FeaturedCollection = forwardRef<HTMLElement, FeaturedCollectionProps>(
             </div>
           </div>
         </div>
+
+        {/* Quick View Modal */}
+        {selectedProduct && (
+          <QuickView
+            isOpen={!!selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+            product={selectedProduct}
+          />
+        )}
       </section>
     );
   }

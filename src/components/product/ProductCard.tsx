@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Product } from "@/types";
-import { formatPrice } from "@/lib/utils"; // Ensure this utility exists and works with numbers
+import { formatPrice } from "@/lib/utils";
 import ProductButton from "@/components/common/ProductButton";
 import QuickViewButton from "@/components/common/QuickViewButton";
 import QuickView from "@/components/common/QuickView";
@@ -25,17 +25,17 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
-  // Format price
-  const formattedPrice = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: product.price.currencyCode,
-  }).format(product.price.amount);
+  // Format price correctly by dividing by 100 to convert from cents to euros
+  const formattedPrice = formatPrice(
+    product.price.amount,
+    product.price.currencyCode
+  );
 
   return (
     <>
       <div className="group relative">
         {/* Image container */}
-        <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100">
+        <div className="relative aspect-[3/4] w-full overflow-hidden rounded-sm bg-gray-100">
           <Link
             href={`/product/${product.handle}`}
             className="block h-full w-full"
@@ -51,22 +51,25 @@ const ProductCard = ({
           </Link>
           {/* Quick View Button - Only show on desktop and when product is not sold out */}
           {showQuickView && !product.isSoldOut && (
-            <div className="absolute inset-x-2 bottom-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            <div className="absolute inset-x-4 bottom-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               <QuickViewButton onClick={() => setIsQuickViewOpen(true)} />
             </div>
           )}
           {/* Badges */}
           <div className="absolute left-2 top-2 flex flex-wrap gap-1">
+            {product.isNew && <Badge variant="new">New</Badge>}
             {product.isSoldOut && <Badge variant="sold-out">Sold out</Badge>}
             {product.isOnlineExclusive && (
               <Badge variant="online-exclusive">Online Exclusive</Badge>
             )}
-            {product.isNew && <Badge variant="new">New</Badge>}
+            {product.comingSoon && (
+              <Badge variant="coming-soon">Coming Soon</Badge>
+            )}
           </div>
         </div>
 
         {/* Product Info */}
-        <div className="mt-4 flex flex-col">
+        <div className="mt-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium text-gray-900">
               <Link href={`/product/${product.handle}`}>{product.title}</Link>

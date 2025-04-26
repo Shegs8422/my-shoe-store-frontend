@@ -1,23 +1,45 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
-import localFont from "next/font/local"; // Corrected import name convention
-import LenisProvider from "@/providers/LenisProvider"; // Assuming you have this
+import localFont from "next/font/local";
+import LenisProvider from "@/providers/LenisProvider";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
-// Define the local font
+// Define all Helvetica font variants
+const helvetica = localFont({
+  src: "../fonts/helvetica/Helvetica.ttf",
+  variable: "--font-helvetica",
+});
+
+const helveticaBold = localFont({
+  src: "../fonts/helvetica/Helvetica-Bold.ttf",
+  variable: "--font-helvetica-bold",
+});
+
+const helveticaLight = localFont({
+  src: "../fonts/helvetica/helvetica-light.ttf",
+  variable: "--font-helvetica-light",
+});
+
 const helveticaCompressed = localFont({
-  src: [
-    // Add other weights/styles of the same family if you have them:
-    {
-      path: "../assets/fonts/helvetica/helvetica-compressed-5871d14b6903a.otf", // Example
-      weight: "400",
-      style: "normal",
-    },
-  ],
-  display: "swap", // Good practice for font loading
-  variable: "--font-helvetica-compressed", // CSS variable name
+  src: "../fonts/helvetica/helvetica-compressed.otf",
+  variable: "--font-helvetica-compressed",
+});
+
+const helveticaCondensed = localFont({
+  src: "../fonts/helvetica/helvetica_condensed.ttf",
+  variable: "--font-helvetica-condensed",
+});
+
+const helveticaUltraCompressed = localFont({
+  src: "../fonts/helvetica/helvetica-ultra-compressed.otf",
+  variable: "--font-helvetica-ultra",
+});
+
+const helveticaBlack = localFont({
+  src: "../fonts/helvetica/helvetica-black.otf",
+  variable: "--font-helvetica-black",
 });
 
 export const metadata: Metadata = {
@@ -28,19 +50,26 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  // Use Readonly type for props
   children: React.ReactNode;
 }>) {
   return (
-    // Apply the font variable to the HTML tag for global access
-    <html lang="en" className={`${helveticaCompressed.variable} font-sans`}>
-      {/* font-sans is a fallback from Tailwind */}
-      <body className="bg-white text-black">
-        {" "}
-        {/* Base body styles */}
+    <html
+      lang="en"
+      className={`
+        ${helvetica.variable}
+        ${helveticaBold.variable}
+        ${helveticaLight.variable}
+        ${helveticaCompressed.variable}
+        ${helveticaCondensed.variable}
+        ${helveticaUltraCompressed.variable}
+        ${helveticaBlack.variable}
+        font-sans
+      `}
+    >
+      <body className="relative bg-transparent text-black">
         <LenisProvider>
           <Header />
-          <main className="pt-20 lg:pt-24">{children}</main>
+          <main className="relative">{children}</main>
           <Footer />
         </LenisProvider>
       </body>

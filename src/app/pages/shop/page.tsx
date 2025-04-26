@@ -6,6 +6,7 @@ import ShopMainSection from "@/components/shop/ShopMainSection";
 import NewArrivalsSection from "@/components/shop/NewArrivalsSection";
 import VideoSection from "@/components/shop/VideoSection";
 import { Product } from "@/types";
+import LatestFootwearSection from "@/components/shop/LatestFootwearSection";
 
 // --- Mock Data (Using the same data as homepage) ---
 const mockProducts: Product[] = [
@@ -144,6 +145,7 @@ export default function ShopPage() {
       <ShopMainSection />
       <NewArrivalsSection products={mockProducts} />
       <VideoSection />
+      <LatestFootwearSection products={mockProducts} />
     </div>
   );
 }

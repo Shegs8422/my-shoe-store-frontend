@@ -9,18 +9,35 @@ const config: Config = {
   ],
   theme: {
     fontFamily: {
-      // Set default sans font to Helvetica
-      sans: ["Helvetica", "system-ui", "sans-serif"],
-      // Variants
-      helvetica: ["Helvetica", "system-ui", "sans-serif"],
-      "helvetica-condensed": ["Helvetica Condensed", "system-ui", "sans-serif"],
+      sans: ["var(--font-helvetica)", "system-ui", "sans-serif"],
+      helvetica: ["var(--font-helvetica)", "system-ui", "sans-serif"],
+      "helvetica-bold": [
+        "var(--font-helvetica-bold)",
+        "system-ui",
+        "sans-serif",
+      ],
+      "helvetica-light": [
+        "var(--font-helvetica-light)",
+        "system-ui",
+        "sans-serif",
+      ],
       "helvetica-compressed": [
-        "Helvetica Compressed",
+        "var(--font-helvetica-compressed)",
+        "system-ui",
+        "sans-serif",
+      ],
+      "helvetica-condensed": [
+        "var(--font-helvetica-condensed)",
         "system-ui",
         "sans-serif",
       ],
       "helvetica-ultra": [
-        "Helvetica Ultra Compressed",
+        "var(--font-helvetica-ultra)",
+        "system-ui",
+        "sans-serif",
+      ],
+      "helvetica-black": [
+        "var(--font-helvetica-black)",
         "system-ui",
         "sans-serif",
       ],

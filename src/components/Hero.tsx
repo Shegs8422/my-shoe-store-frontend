@@ -7,23 +7,23 @@ const Hero = () => {
       <div className="container mx-auto px-4 h-full">
         <div className="grid md:grid-cols-2 gap-8 h-full items-center">
           <div className="space-y-6">
-            <h1 className="text-5xl font-bold leading-tight">
+            <h1 className="text-5xl font-helvetica-black leading-tight">
               Step into Style with Our Latest Collection
             </h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 font-helvetica-light">
               Discover premium comfort and trendsetting designs in our new
               season arrivals.
             </p>
             <div className="space-x-4">
               <Link
                 href="/collection"
-                className="inline-block px-8 py-3 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                className="inline-block px-8 py-3 bg-black text-white rounded-md hover:bg-gray-800 transition-colors font-helvetica-compressed"
               >
                 Shop Now
               </Link>
               <Link
                 href="/new-arrivals"
-                className="inline-block px-8 py-3 border border-black text-black rounded-md hover:bg-gray-100 transition-colors"
+                className="inline-block px-8 py-3 border border-black text-black rounded-md hover:bg-gray-100 transition-colors font-helvetica-compressed"
               >
                 New Arrivals
               </Link>

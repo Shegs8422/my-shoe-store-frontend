@@ -122,13 +122,13 @@ const Header = () => {
     hover:text-primary
     after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300
     hover:after:w-full
-    font-helvetica-condensed
+    font-helvetica-compressed
   `;
   const utilityLinkClasses = `
     text-white text-xs font-medium uppercase tracking-wider
     hover:opacity-80 transition-opacity duration-150
     flex items-center gap-1.5
-    font-helvetica-condensed
+    font-helvetica-compressed
   `;
   // --- End Base Classes ---
 
@@ -138,22 +138,17 @@ const Header = () => {
     <>
       <header
         className={clsx(
-          "fixed top-0 left-0 right-0 z-50",
+          "fixed top-0 left-0 right-0 z-[100] bg-transparent",
           "flex items-center h-20 lg:h-24",
           "pointer-events-auto",
           "mix-blend-difference",
           "transition-transform duration-300 ease-out-cubic",
           hidden ? "-translate-y-full" : "translate-y-0"
         )}
-        style={{
-          background: "transparent",
-          backdropFilter: "none",
-          WebkitBackdropFilter: "none",
-        }}
         aria-label="Main Navigation"
       >
-        <div className="container mx-auto px-4 lg:px-6 w-full">
-          <nav className="flex justify-between items-center w-full h-full">
+        <div className="container mx-auto px-4 lg:px-6 w-full bg-transparent">
+          <nav className="flex justify-between items-center w-full h-full bg-transparent">
             {/* Logo */}
             <div className="flex-shrink-0 z-10">
               <Link href="/" aria-label="Go to homepage">

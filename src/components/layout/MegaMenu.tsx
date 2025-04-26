@@ -19,7 +19,7 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ links, className }) => {
     // Base styles
     "block py-1.5",
     "text-black text-xs font-medium uppercase leading-none tracking-wider whitespace-nowrap",
-    "font-helvetica-condensed",
+    "font-helvetica-compressed",
 
     // Transitions
     "transition-opacity duration-150 ease-out",

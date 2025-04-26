@@ -31,7 +31,7 @@ export default function HomePage() {
   const newArrivals = ensureMinimumProducts(collections.newArrivals, 12);
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen relative z-0">
       {/* Hero Section */}
       <HeroSection />
 

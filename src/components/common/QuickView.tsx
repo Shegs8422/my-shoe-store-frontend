@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Product } from "@/types";
+import { formatPrice } from "@/lib/utils";
 
 interface QuickViewProps {
   product: Product;
@@ -9,157 +11,266 @@ interface QuickViewProps {
   onClose: () => void;
 }
 
+type SizeUnit = "EU" | "UK" | "US";
+
 const QuickView: React.FC<QuickViewProps> = ({ product, isOpen, onClose }) => {
   const { title, vendor, price, images, isNew, colorName, featuredImage } =
     product;
+  const formattedPrice = formatPrice(price.amount, price.currencyCode);
+  const [sizeUnit, setSizeUnit] = useState<SizeUnit>("EU");
+  const [selectedSize, setSelectedSize] = useState<string>("2.5");
+  const [mounted, setMounted] = useState(false);
 
-  const primaryImage =
-    featuredImage ||
-    (Array.isArray(images) && images.length > 0 ? images[0] : null);
-  const formattedPrice = `€${(price.amount / 100).toFixed(2)}`;
+  const isFootwear =
+    vendor?.toLowerCase().includes("nike") ||
+    vendor?.toLowerCase().includes("adidas") ||
+    vendor?.toLowerCase().includes("new balance") ||
+    title.toLowerCase().includes("shoe") ||
+    title.toLowerCase().includes("sneaker");
 
-  // Handle body scroll lock
+  const sizeGuides = {
+    EU: [
+      "36.5",
+      "37.5",
+      "38.0",
+      "38.5",
+      "39.0",
+      "40.0",
+      "40.5",
+      "41.0",
+      "42.0",
+      "42.5",
+      "43.0",
+      "44.0",
+      "44.5",
+      "45.0",
+      "45.5",
+    ],
+    UK: [
+      "2.5",
+      "3.0",
+      "3.5",
+      "4.0",
+      "4.5",
+      "5.0",
+      "5.5",
+      "6.0",
+      "6.5",
+      "7.0",
+      "7.5",
+      "8.0",
+      "8.5",
+      "9.0",
+      "9.5",
+      "10.0",
+      "10.5",
+      "11.0",
+      "11.5",
+      "12.0",
+    ],
+    US: [
+      "3.5",
+      "4.0",
+      "4.5",
+      "5.0",
+      "5.5",
+      "6.0",
+      "6.5",
+      "7.0",
+      "7.5",
+      "8.0",
+      "8.5",
+      "9.0",
+      "9.5",
+      "10.0",
+      "10.5",
+      "11.0",
+      "11.5",
+      "12.0",
+      "12.5",
+      "13.0",
+    ],
+  };
+
+  const handleEscapeKey = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    },
+    [onClose]
+  );
+
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
+      document.addEventListener("keydown", handleEscapeKey);
     }
 
     return () => {
-      document.body.style.overflow = "unset";
+      document.removeEventListener("keydown", handleEscapeKey);
     };
-  }, [isOpen]);
+  }, [isOpen, handleEscapeKey]);
 
-  return (
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-[9999] overflow-hidden">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-50"
+            className="fixed inset-0 bg-black/50"
           />
 
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[650px] bg-white z-50"
-          >
-            {/* Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg">Quick View</h2>
-              <div className="flex items-center gap-6">
-                <button
-                  type="button"
-                  className="hover:text-gray-500"
-                  aria-label="Add to wishlist"
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                  >
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                </button>
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative bg-white rounded shadow-xl w-full max-w-[28rem] mx-4 max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <header className="py-7 px-4 flex justify-between items-center">
+                <h2 className="text-xl font-medium">Quick View</h2>
                 <button
                   onClick={onClose}
-                  className="text-sm font-medium tracking-wide hover:text-gray-500"
+                  className="px-3 py-1 text-xs uppercase tracking-wide border hover:border-black border-gray-300 rounded-[2px] transition-colors"
                 >
-                  CLOSE
+                  Close
                 </button>
-              </div>
-            </div>
+              </header>
 
-            <div className="grid grid-cols-2">
-              {/* Product Image */}
-              <div className="relative aspect-[3/4]">
-                {primaryImage && (
-                  <Image
-                    src={primaryImage.src}
-                    alt={primaryImage.alt}
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                )}
-                {isNew && (
-                  <span className="absolute top-4 left-4 bg-black text-white text-xs font-medium px-2 py-1">
-                    NEW
-                  </span>
-                )}
-              </div>
+              <div className="no-scrollbar block rounded px-4">
+                <div className="px-0 lg:px-4 relative rounded bg-white">
+                  <ul className="pointer-events-none flex items-center justify-start gap-1 mb-3 lg:mb-4">
+                    {isNew && (
+                      <li
+                        className="flex items-center justify-center px-2 py-0.5 h-5 rounded-sm border text-[10px] uppercase tracking-wide font-medium"
+                        style={{
+                          backgroundColor: "#000000",
+                          borderColor: "#000000",
+                          color: "#ffffff",
+                        }}
+                      >
+                        New
+                      </li>
+                    )}
+                  </ul>
 
-              {/* Product Info */}
-              <div className="p-6 space-y-5">
-                {vendor && <p className="text-sm font-medium">{vendor}</p>}
-                <h3 className="text-base">{title}</h3>
-                <p className="text-base font-medium">{formattedPrice}</p>
+                  <header className="pr-4 lg:pr-8">
+                    {vendor && (
+                      <p className="text-sm font-medium mb-1 leading-none">
+                        {vendor}
+                      </p>
+                    )}
+                    <h1 className="text-base font-medium mb-2.5 leading-none">
+                      {title}
+                    </h1>
+                    <div className="flex gap-1 items-center justify-start">
+                      <p className="text-base font-medium leading-none">
+                        {formattedPrice}
+                      </p>
+                    </div>
+                  </header>
 
-                {colorName && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600">Color: {colorName}</p>
-                    <div className="inline-block border border-black p-1">
-                      <div className="w-12 h-12 bg-gray-100">
-                        {primaryImage && (
-                          <Image
-                            src={primaryImage.src}
-                            alt={primaryImage.alt}
-                            width={48}
-                            height={48}
-                            className="object-cover w-full h-full"
-                          />
-                        )}
-                      </div>
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-500 mb-2">
+                      Color: {colorName}
+                    </p>
+                    <div className="inline-block border border-black">
+                      {featuredImage && (
+                        <Image
+                          src={featuredImage.src}
+                          alt={featuredImage.alt}
+                          width={64}
+                          height={64}
+                          className="object-cover"
+                        />
+                      )}
                     </div>
                   </div>
-                )}
 
-                {/* Size Selector */}
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm">Size: In Stock</span>
+                  <div className="mt-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="text-sm text-gray-500">Size: In Stock</p>
+                      {isFootwear && (
+                        <div className="flex gap-4 text-xs">
+                          <button
+                            onClick={() => setSizeUnit("EU")}
+                            className={`${
+                              sizeUnit === "EU" ? "text-black" : "text-gray-400"
+                            } hover:text-black transition-colors`}
+                          >
+                            EU
+                          </button>
+                          <button
+                            onClick={() => setSizeUnit("UK")}
+                            className={`${
+                              sizeUnit === "UK" ? "text-black" : "text-gray-400"
+                            } hover:text-black transition-colors`}
+                          >
+                            UK
+                          </button>
+                          <button
+                            onClick={() => setSizeUnit("US")}
+                            className={`${
+                              sizeUnit === "US" ? "text-black" : "text-gray-400"
+                            } hover:text-black transition-colors`}
+                          >
+                            US
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {sizeGuides[sizeUnit].map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSize(size)}
+                          className={`py-2 text-sm border rounded-[2px] transition-colors font-helvetica-compressed
+                            ${
+                              size === selectedSize
+                                ? "border-black"
+                                : "border-gray-200 hover:border-black"
+                            }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="grid grid-cols-6 gap-1.5">
-                    {["XS", "S", "M", "L", "XL", "XXL"].map((size) => (
-                      <button
-                        key={size}
-                        className="py-1.5 text-sm border hover:border-black transition-colors"
-                      >
-                        {size}
-                      </button>
-                    ))}
+
+                  <div className="mt-6 grid grid-cols-2 gap-3 pb-4">
+                    <button
+                      type="button"
+                      className="h-11 text-sm font-medium border border-gray-200 hover:border-black transition-colors uppercase tracking-wide rounded-[2px]"
+                    >
+                      Find in Store
+                    </button>
+                    <button
+                      type="submit"
+                      className="h-11 text-sm font-medium bg-black text-white hover:bg-gray-900 transition-colors uppercase tracking-wide rounded-[2px]"
+                    >
+                      Add to Cart
+                    </button>
                   </div>
-                </div>
-
-                <p className="text-sm text-gray-600">
-                  Jayden is 184cm and wears a size large
-                </p>
-
-                {/* Action Buttons */}
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <button className="h-11 text-sm font-medium border border-black hover:bg-black hover:text-white transition-colors uppercase tracking-wide">
-                    Find in store
-                  </button>
-                  <button className="h-11 text-sm font-medium bg-black text-white hover:bg-gray-900 transition-colors uppercase tracking-wide">
-                    Add to cart
-                  </button>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        </>
+            </motion.div>
+          </div>
+        </div>
       )}
     </AnimatePresence>
   );
+
+  if (!mounted) return null;
+
+  return createPortal(modalContent, document.body);
 };
 
 export default QuickView;

@@ -84,7 +84,7 @@ const ShopMainSection = () => {
   };
 
   return (
-    <section className="shopify-section section_featured-links bg-white px-4 sm:px-6 lg:px-10 pb-16 lg:pb-24">
+    <section className=" bg-white px-4 sm:px-6 lg:px-10 pb-16 lg:pb-24 mt-20 lg:mt-24">
       <AnimatePresence>
         <motion.ul
           className="container-content relative isolate grid h-full w-full gap-3 pb-content lg:grid-cols-2"

@@ -7,9 +7,10 @@ import useEmblaCarousel from "embla-carousel-react";
 import type { EmblaOptionsType } from "embla-carousel";
 import Image from "next/image";
 
-import ProductCard from "@/components/product/ProductCard"; // Adjust path if needed
-import MouseFollowTooltip from "@/components/common/MouseFollowTooltip"; // Adjust path if needed
-import { Product } from "@/types"; // Ensure this type path is correct
+import ProductCard from "@/components/product/ProductCard";
+import MouseFollowTooltip from "@/components/common/MouseFollowTooltip";
+import QuickView from "@/components/common/QuickView";
+import { Product } from "@/types";
 
 interface ProductSliderSectionProps {
   title: string;
@@ -31,6 +32,7 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
   // --- Tooltip State & Refs ---
   const [isHoveringSlider, setIsHoveringSlider] = useState(false);
   const tooltipRef = useRef<HTMLSpanElement>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // --- Embla Configuration ---
   const defaultOptions: EmblaOptionsType = {
@@ -95,6 +97,10 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
       setIsHoveringSlider(false);
     }
   }, [showDragTooltip]);
+
+  const handleQuickView = (product: Product) => {
+    setSelectedProduct(product);
+  };
   // --- End Tooltip Event Handlers ---
 
   if (!products || products.length === 0) return null;
@@ -104,7 +110,7 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
       {/* Section Header */}
       <header className="mb-6 lg:mb-10">
         <div className="w-full px-4 lg:px-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
-          <h3 className="text-[64px] lg:text-[96px] leading-none tracking-tight font-helvetica font-bold text-black mb-4 lg:mb-0">
+          <h3 className="text-[64px] lg:text-[96px] leading-none tracking-tight font-helvetica-black text-black mb-4 lg:mb-0">
             {title}
           </h3>
           {/* Desktop Controls: Only View All Button */}
@@ -114,7 +120,7 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
             <Link href={viewAllLink} passHref>
               <button
                 type="button"
-                className="bg-black text-white text-xs font-medium py-2 px-4 rounded-sm hover:bg-gray-800 transition-colors whitespace-nowrap"
+                className="bg-black text-white text-xs font-medium py-2 px-4 rounded-sm hover:bg-gray-800 transition-colors whitespace-nowrap font-helvetica-compressed"
               >
                 {viewAllText}
               </button>
@@ -138,58 +144,12 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
               key={product.id || `product-${index}`}
               className="embla__slide pr-3 md:pr-4 lg:pr-5 xl:pr-6 w-10/12 sm:w-1/2 md:w-[40%] lg:w-[30%] xl:w-1/4 2xl:w-1/5"
             >
-              <div className="h-full">
-                <div className="relative group">
-                  <Link href={`/product/${product.handle}`}>
-                    <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
-                      {product.featuredImage && (
-                        <Image
-                          src={product.featuredImage.src}
-                          alt={product.featuredImage.alt}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                      )}
-
-                      {/* Badges */}
-                      <div className="absolute top-2 left-2 flex flex-row gap-1.5">
-                        {product.isNew && (
-                          <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-black text-white">
-                            New
-                          </span>
-                        )}
-                        {product.comingSoon && (
-                          <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-yellow-400 text-black">
-                            Coming Soon
-                          </span>
-                        )}
-                        {product.isOnlineExclusive && (
-                          <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-green-500 text-white">
-                            Online Exclusive
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-
-                  <div className="mt-3">
-                    <Link href={`/product/${product.handle}`} className="block">
-                      {product.vendor && (
-                        <p className="text-sm font-medium">{product.vendor}</p>
-                      )}
-                      <h3 className="text-sm mt-1">{product.title}</h3>
-                      {product.colorName && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          {product.colorName}
-                        </p>
-                      )}
-                      <p className="text-sm font-medium mt-1">
-                        €{(product.price.amount / 100).toFixed(2)}
-                      </p>
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              <ProductCard
+                product={product}
+                priority={index < 4}
+                showQuickView={true}
+                onQuickView={handleQuickView}
+              />
             </div>
           ))}
         </div>
@@ -200,7 +160,7 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
         <Link href={viewAllLink} passHref>
           <button
             type="button"
-            className="w-full text-center block bg-black text-white text-sm font-medium py-3 px-5 rounded-sm hover:bg-gray-800 transition-colors"
+            className="w-full text-center block bg-black text-white text-sm font-medium py-3 px-5 rounded-sm hover:bg-gray-800 transition-colors font-helvetica-compressed"
           >
             {viewAllText}
           </button>
@@ -213,6 +173,15 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
           ref={tooltipRef}
           text="CLICK & DRAG" // Uppercase text
           isVisible={isHoveringSlider}
+        />
+      )}
+
+      {/* Quick View Modal */}
+      {selectedProduct && (
+        <QuickView
+          isOpen={!!selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          product={selectedProduct}
         />
       )}
     </section>

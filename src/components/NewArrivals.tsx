@@ -17,21 +17,25 @@ const NewArrivals = () => {
 
         {/* Badges */}
         <div className="absolute top-4 left-4 flex flex-row gap-1.5">
-          <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-black text-white">
+          <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-black text-white font-helvetica-compressed">
             New
           </span>
-          <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-yellow-400 text-black">
+          <span className="text-[10px] lg:text-xs leading-none font-medium px-1.5 py-0.5 rounded-sm bg-yellow-400 text-black font-helvetica-compressed">
             Coming Soon
           </span>
         </div>
 
         {/* Content */}
         <div className="absolute bottom-12 left-4 text-white">
-          <span className="text-sm uppercase mb-2 block">New Arrivals</span>
-          <h1 className="text-6xl font-bold mb-6">Patta Eyewear '25</h1>
+          <span className="text-sm uppercase mb-2 block font-helvetica-light">
+            New Arrivals
+          </span>
+          <h1 className="text-6xl font-helvetica-black mb-6">
+            Patta Eyewear '25
+          </h1>
           <Link
             href="/collections/eyewear"
-            className="inline-block bg-white text-black px-6 py-3 text-sm uppercase hover:bg-opacity-90 transition-colors"
+            className="inline-block bg-white text-black px-6 py-3 text-sm uppercase hover:bg-opacity-90 transition-colors font-helvetica-compressed"
           >
             Shop Now
           </Link>
