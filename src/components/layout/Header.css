@@ -1,0 +1,92 @@
+/* Reset any potential conflicting styles */
+header *,
+header *::before,
+header *::after {
+  mix-blend-mode: initial;
+}
+
+/* Header navigation styles with higher specificity */
+header .header-nav-link {
+  mix-blend-mode: difference !important;
+  color: white !important;
+  position: relative;
+  z-index: 101;
+  isolation: isolate;
+  background: transparent !important;
+}
+
+/* Target the actual text content */
+header .header-nav-link > span {
+  mix-blend-mode: difference !important;
+  color: white !important;
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+}
+
+/* Create a stacking context for blend mode */
+.header-nav-wrapper {
+  position: relative;
+  isolation: isolate;
+  z-index: 2;
+  background: transparent !important;
+}
+
+/* Logo styles */
+header .header-logo {
+  mix-blend-mode: difference !important;
+  isolation: isolate;
+  z-index: 101;
+  background: transparent !important;
+}
+
+/* Utility navigation styles */
+header .header-utility {
+  mix-blend-mode: difference !important;
+  isolation: isolate;
+  z-index: 101;
+  color: white !important;
+  background: transparent !important;
+}
+
+/* Ensure proper contrast for accessibility */
+@supports (mix-blend-mode: difference) {
+  header .header-nav-link,
+  header .header-utility,
+  header .header-logo {
+    mix-blend-mode: difference !important;
+    color: white !important;
+    font-weight: 500;
+    text-shadow: 0 0 0 white;
+  }
+
+  header .header-nav-link:hover,
+  header .header-utility:hover {
+    opacity: 1;
+  }
+}
+
+/* Force hardware acceleration for better blend mode performance */
+header .header-nav-link,
+header .header-utility,
+header .header-logo {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header background for blend mode context */
+.header-background {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  z-index: 1;
+}
+
+/* Force white text color for all header nav items */
+.header-nav-link,
+.header-utility,
+.header-logo {
+  color: white !important;
+  font-weight: 500;
+}

@@ -1,12 +1,13 @@
 // src/components/layout/Header.tsx
 "use client"; // This component uses hooks and browser APIs
 
-import React, { useState, useEffect } from "react"; // Import useState for mobile menu
+import React, { useState, useEffect, useRef } from "react"; // Import useState for mobile menu
 import Link from "next/link";
 import Image from "next/image";
 import MegaMenu from "./MegaMenu"; // Adjust path if needed
 import { useLenisScroll } from "@/contexts/LenisScrollContext"; // Import the new hook
 import clsx from "clsx";
+import "./Header.css";
 
 // --- Placeholder Icons ---
 // TODO: Replace with actual SVG imports or components
@@ -37,6 +38,17 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile
   const [hidden, setHidden] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+  // Dropdown state
+  const [openDropdown, setOpenDropdown] = useState<
+    null | "shop" | "exclusive" | "community" | "ss25"
+  >(null);
+  const [isHoveringDropdown, setIsHoveringDropdown] = useState(false);
+
+  // Refs for nav links
+  const shopRef = useRef<HTMLAnchorElement>(null);
+  const exclusiveRef = useRef<HTMLAnchorElement>(null);
+  const communityRef = useRef<HTMLAnchorElement>(null);
+  const ss25Ref = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -114,207 +126,225 @@ const Header = () => {
   // --- End Link Data ---
 
   // --- Base classes ---
-  const navLinkClasses = `
-    relative z-10 block py-1
-    text-white text-xs font-medium uppercase tracking-wider
-    transition-all duration-200 ease-out
-    group-hover/mainnav:opacity-40 hover:!opacity-100
-    hover:text-primary
-    after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300
-    hover:after:w-full
-    font-helvetica-compressed
-  `;
-  const utilityLinkClasses = `
-    text-white text-xs font-medium uppercase tracking-wider
-    hover:opacity-80 transition-opacity duration-150
-    flex items-center gap-1.5
-    font-helvetica-compressed
-  `;
+  const navLinkClasses = clsx(
+    "header-nav-link",
+    // Layout & Positioning
+    "block py-1",
+    // Typography
+    "text-xs font-medium uppercase tracking-wider font-helvetica-compressed",
+    // Transitions & Effects
+    "transition-all duration-200 ease-out",
+    "group-hover/mainnav:opacity-40 hover:!opacity-100",
+    "hover:text-primary",
+    "cursor-pointer",
+    // Underline effect
+    "after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300",
+    "hover:after:w-full"
+  );
+
+  const utilityLinkClasses = clsx(
+    "header-utility",
+    // Typography
+    "text-xs font-medium uppercase tracking-wider font-helvetica-compressed",
+    // Layout
+    "flex items-center gap-1.5",
+    // Interactions
+    "hover:opacity-80 transition-opacity duration-150",
+    "cursor-pointer"
+  );
   // --- End Base Classes ---
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+  // Handlers for dropdowns
+  const handleDropdownOpen = (name: typeof openDropdown) =>
+    setOpenDropdown(name);
+  const handleDropdownClose = () => {
+    // Only close if not hovering dropdown
+    setTimeout(() => {
+      setOpenDropdown((current) => (isHoveringDropdown ? current : null));
+    }, 50);
+  };
 
   return (
     <>
       <header
         className={clsx(
-          "fixed top-0 left-0 right-0 z-[100] bg-transparent",
+          "fixed top-0 left-0 right-0 z-[100]",
           "flex items-center h-20 lg:h-24",
           "pointer-events-auto",
-          "mix-blend-difference",
           "transition-transform duration-300 ease-out-cubic",
           hidden ? "-translate-y-full" : "translate-y-0"
         )}
         aria-label="Main Navigation"
       >
-        <div className="container mx-auto px-4 lg:px-6 w-full bg-transparent">
-          <nav className="flex justify-between items-center w-full h-full bg-transparent">
-            {/* Logo */}
-            <div className="flex-shrink-0 z-10">
-              <Link href="/" aria-label="Go to homepage">
-                <Image
-                  src="/patta-logo-white.svg"
-                  alt="Patta Logo"
-                  width={90}
-                  height={50}
-                  className="w-auto h-12 lg:h-16"
-                  priority
-                />
-              </Link>
-            </div>
-
-            {/* Main Navigation (Desktop) - Centered */}
-            <ul className="group/mainnav hidden lg:flex flex-row items-center justify-center gap-6 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <li className="group/dropdown-menu relative">
-                <Link href="/pages/shop" className={navLinkClasses}>
-                  Shop
+        <div className="header-background" />
+        <div className="container mx-auto px-4 lg:px-6 w-full">
+          <nav className="flex justify-between items-center w-full h-full header-nav-wrapper">
+            <div className="relative w-full flex justify-between items-center">
+              {/* Logo */}
+              <div className="flex-shrink-0 header-logo">
+                <Link href="/" aria-label="Go to homepage">
+                  <Image
+                    src="/patta-logo-white.svg"
+                    alt="Patta Logo"
+                    width={90}
+                    height={50}
+                    className="w-auto h-12 lg:h-16"
+                    priority
+                  />
                 </Link>
-                <div className="absolute top-full left-0 pt-5 group-hover/dropdown-menu:pointer-events-auto">
-                  <div
-                    className="
-                      opacity-0 invisible scale-95
-                      group-hover/dropdown-menu:visible
-                      group-hover/dropdown-menu:opacity-100
-                      group-hover/dropdown-menu:scale-100
-                      group-hover/dropdown-menu:translate-y-0
-                      translate-y-1
-                      transition-all duration-300 ease-out-cubic
-                      will-change-transform origin-top-left
-                      shadow-xl
-                    "
-                  >
+              </div>
+
+              {/* Main Navigation (Desktop) - Centered */}
+              <ul className="group/mainnav hidden lg:flex flex-row items-center justify-center gap-6 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <li
+                  className="group/dropdown-menu relative"
+                  onMouseEnter={() => handleDropdownOpen("shop")}
+                  onMouseLeave={handleDropdownClose}
+                  onFocus={() => handleDropdownOpen("shop")}
+                  onBlur={handleDropdownClose}
+                >
+                  <Link href="/pages/shop" className={navLinkClasses}>
+                    <span className="relative z-[2]">Shop</span>
+                  </Link>
+                  {openDropdown === "shop" && (
                     <MegaMenu
                       links={shopLinks}
                       className="font-helvetica-condensed"
+                      anchorRef={shopRef}
+                      onDropdownMouseEnter={() => setIsHoveringDropdown(true)}
+                      onDropdownMouseLeave={() => {
+                        setIsHoveringDropdown(false);
+                        setTimeout(() => {
+                          setOpenDropdown((current) =>
+                            current === "shop" ? null : current
+                          );
+                        }, 50);
+                      }}
                     />
-                  </div>
-                </div>
-              </li>
-              <li className="group/dropdown-menu relative">
-                <Link href="/pages/exclusives" className={navLinkClasses}>
-                  Exclusive
-                </Link>
-                <div className="absolute top-full left-0 pt-5 group-hover/dropdown-menu:pointer-events-auto">
-                  <div
-                    className="
-                      opacity-0 invisible scale-95
-                      group-hover/dropdown-menu:visible
-                      group-hover/dropdown-menu:opacity-100
-                      group-hover/dropdown-menu:scale-100
-                      group-hover/dropdown-menu:translate-y-0
-                      translate-y-1
-                      transition-all duration-300 ease-out-cubic
-                      will-change-transform origin-top-left
-                      shadow-xl
-                    "
-                  >
+                  )}
+                </li>
+                <li
+                  className="group/dropdown-menu relative"
+                  onMouseEnter={() => handleDropdownOpen("exclusive")}
+                  onMouseLeave={handleDropdownClose}
+                  onFocus={() => handleDropdownOpen("exclusive")}
+                  onBlur={handleDropdownClose}
+                >
+                  <Link href="/pages/exclusives" className={navLinkClasses}>
+                    <span className="relative z-[2]">Exclusive</span>
+                  </Link>
+                  {openDropdown === "exclusive" && (
                     <MegaMenu
                       links={exclusiveLinks}
                       className="font-helvetica-condensed"
+                      anchorRef={exclusiveRef}
+                      onDropdownMouseEnter={() => setIsHoveringDropdown(true)}
+                      onDropdownMouseLeave={() => {
+                        setIsHoveringDropdown(false);
+                        setTimeout(() => {
+                          setOpenDropdown((current) =>
+                            current === "exclusive" ? null : current
+                          );
+                        }, 50);
+                      }}
                     />
-                  </div>
-                </div>
-              </li>
-              <li className="group/dropdown-menu relative">
-                <Link href="/pages/community" className={navLinkClasses}>
-                  Community
-                </Link>
-                <div className="absolute top-full left-0 pt-5 group-hover/dropdown-menu:pointer-events-auto">
-                  <div
-                    className="
-                      opacity-0 invisible scale-95
-                      group-hover/dropdown-menu:visible
-                      group-hover/dropdown-menu:opacity-100
-                      group-hover/dropdown-menu:scale-100
-                      group-hover/dropdown-menu:translate-y-0
-                      translate-y-1
-                      transition-all duration-300 ease-out-cubic
-                      will-change-transform origin-top-left
-                      shadow-xl
-                    "
-                  >
+                  )}
+                </li>
+                <li
+                  className="group/dropdown-menu relative"
+                  onMouseEnter={() => handleDropdownOpen("community")}
+                  onMouseLeave={handleDropdownClose}
+                  onFocus={() => handleDropdownOpen("community")}
+                  onBlur={handleDropdownClose}
+                >
+                  <Link href="/pages/community" className={navLinkClasses}>
+                    <span className="relative z-[2]">Community</span>
+                  </Link>
+                  {openDropdown === "community" && (
                     <MegaMenu
                       links={communityLinks}
                       className="font-helvetica-condensed"
+                      anchorRef={communityRef}
+                      onDropdownMouseEnter={() => setIsHoveringDropdown(true)}
+                      onDropdownMouseLeave={() => {
+                        setIsHoveringDropdown(false);
+                        setTimeout(() => {
+                          setOpenDropdown((current) =>
+                            current === "community" ? null : current
+                          );
+                        }, 50);
+                      }}
                     />
-                  </div>
-                </div>
-              </li>
-              <li className="group/dropdown-menu relative">
-                <Link
-                  href="/collections/spring-summer-2025"
-                  className={navLinkClasses}
+                  )}
+                </li>
+                <li
+                  className="group/dropdown-menu relative"
+                  onMouseEnter={() => handleDropdownOpen("ss25")}
+                  onMouseLeave={handleDropdownClose}
+                  onFocus={() => handleDropdownOpen("ss25")}
+                  onBlur={handleDropdownClose}
                 >
-                  Spring Summer 2025
-                </Link>
-                <div className="absolute top-full left-0 pt-5 group-hover/dropdown-menu:pointer-events-auto">
-                  <div
-                    className="
-                      opacity-0 invisible scale-95
-                      group-hover/dropdown-menu:visible
-                      group-hover/dropdown-menu:opacity-100
-                      group-hover/dropdown-menu:scale-100
-                      group-hover/dropdown-menu:translate-y-0
-                      translate-y-1
-                      transition-all duration-300 ease-out-cubic
-                      will-change-transform origin-top-left
-                      shadow-xl
-                    "
+                  <Link
+                    href="/collections/spring-summer-2025"
+                    className={navLinkClasses}
                   >
+                    <span className="relative z-[2]">Spring Summer 2025</span>
+                  </Link>
+                  {openDropdown === "ss25" && (
                     <MegaMenu
                       links={ss25Links}
                       className="font-helvetica-condensed"
+                      anchorRef={ss25Ref}
+                      onDropdownMouseEnter={() => setIsHoveringDropdown(true)}
+                      onDropdownMouseLeave={() => {
+                        setIsHoveringDropdown(false);
+                        setTimeout(() => {
+                          setOpenDropdown((current) =>
+                            current === "ss25" ? null : current
+                          );
+                        }, 50);
+                      }}
                     />
-                  </div>
-                </div>
-              </li>
-            </ul>
+                  )}
+                </li>
+              </ul>
 
-            {/* Utility Navigation (Desktop) */}
-            <div className="hidden lg:flex items-center justify-end gap-4 lg:gap-6">
-              <button type="button" className={utilityLinkClasses}>
-                <GlobeIcon /> NL/EN
-              </button>
+              {/* Utility Navigation */}
+              <div className="hidden lg:flex items-center justify-end gap-4 lg:gap-6">
+                <button type="button" className={utilityLinkClasses}>
+                  <span className="relative z-[2]">
+                    <GlobeIcon /> NL/EN
+                  </span>
+                </button>
+                <button type="button" className={utilityLinkClasses}>
+                  <span className="relative z-[2]">Search</span>
+                </button>
+                <Link href="/account" className={utilityLinkClasses}>
+                  <span className="relative z-[2]">Account</span>
+                </Link>
+                <Link href="/wishlist" className={utilityLinkClasses}>
+                  <span className="relative z-[2]">Favorites</span>
+                </Link>
+                <Link href="/cart" className={utilityLinkClasses}>
+                  <span className="relative z-[2]">Cart</span>
+                </Link>
+              </div>
+
+              {/* Mobile Menu Button */}
               <button
                 type="button"
-                className={utilityLinkClasses}
-                aria-label="Search"
+                className={clsx(utilityLinkClasses, "lg:hidden")}
+                aria-label="Open menu"
+                onClick={toggleMobileMenu}
+                aria-expanded={isMobileMenuOpen}
               >
-                Search
+                <span className="relative z-[2]">
+                  <MenuIcon />
+                </span>
               </button>
-              <Link
-                href="/account"
-                className={utilityLinkClasses}
-                aria-label="Account"
-              >
-                Account
-              </Link>
-              <Link
-                href="/wishlist"
-                className={utilityLinkClasses}
-                aria-label="Wishlist"
-              >
-                Favorites
-              </Link>
-              <Link
-                href="/cart"
-                className={utilityLinkClasses}
-                aria-label="Cart"
-              >
-                Cart
-              </Link>
             </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              type="button"
-              className={`${utilityLinkClasses} lg:hidden z-10`}
-              aria-label="Open menu"
-              onClick={toggleMobileMenu}
-              aria-expanded={isMobileMenuOpen}
-            >
-              <MenuIcon />
-            </button>
           </nav>
         </div>
       </header>

@@ -1,7 +1,8 @@
 // src/components/layout/MegaMenu.tsx
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import clsx from "clsx";
+import type { RefObject } from "react";
+import "./MegaMenu.css";
 
 type MenuLink = {
   label: string;
@@ -11,34 +12,41 @@ type MenuLink = {
 interface MegaMenuProps {
   links: MenuLink[];
   className?: string;
+  anchorRef?: RefObject<HTMLElement | null>;
+  onDropdownMouseEnter?: () => void;
+  onDropdownMouseLeave?: () => void;
 }
 
-const MegaMenu: React.FC<MegaMenuProps> = ({ links, className }) => {
-  // Apply base faded style on list hover, full opacity on item hover
-  const linkStyle = clsx(
-    // Base styles
-    "block py-1.5",
-    "text-black text-xs font-medium uppercase leading-none tracking-wider whitespace-nowrap",
-    "font-helvetica-compressed",
+const MegaMenu: React.FC<MegaMenuProps> = ({
+  links,
+  className,
+  anchorRef,
+  onDropdownMouseEnter,
+  onDropdownMouseLeave,
+}) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
 
-    // Transitions
-    "transition-opacity duration-150 ease-out",
-    "group-hover/megamenu:opacity-40 hover:!opacity-100",
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    // Additional classes passed in
-    className
-  );
+  if (typeof window === "undefined" || !mounted) return null;
 
   return (
-    // Added 'isolate' class here
-    <div className="isolate absolute top-full left-0 w-auto min-w-[160px] bg-white rounded shadow-lg p-4 z-30">
-      {/* Add group name to the list */}
-      <ul className="group/megamenu flex flex-col items-start">
+    <div
+      ref={menuRef}
+      className="mega-menu-container"
+      onMouseEnter={onDropdownMouseEnter}
+      onMouseLeave={onDropdownMouseLeave}
+    >
+      <ul className="mega-menu-list">
         {links.map((link) => (
-          <li key={link.href} className="self-stretch">
-            {" "}
-            {/* No hover styles on li itself */}
-            <Link href={link.href} className={linkStyle}>
+          <li key={link.href} className="mega-menu-item">
+            <Link
+              href={link.href}
+              className={`mega-menu-link ${className || ""}`}
+            >
               {link.label}
             </Link>
           </li>

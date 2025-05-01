@@ -1,12 +1,14 @@
 // src/app/pages/shop/page.tsx
 "use client";
 
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import ShopMainSection from "@/components/shop/ShopMainSection";
 import NewArrivalsSection from "@/components/shop/NewArrivalsSection";
 import VideoSection from "@/components/shop/VideoSection";
 import { Product } from "@/types";
 import LatestFootwearSection from "@/components/shop/LatestFootwearSection";
+import PromoCard from "@/components/home/PromoCard";
+import MarqueeBanner from "@/components/common/MarqueeBanner";
 
 // --- Mock Data (Using the same data as homepage) ---
 const mockProducts: Product[] = [
@@ -140,12 +142,149 @@ const mockProducts: Product[] = [
 ];
 
 export default function ShopPage() {
+  // --- Drag logic for promo card container ---
+  interface Position {
+    x: number;
+    y: number;
+  }
+  const containerRef = useRef<HTMLDivElement>(null);
+  const draggableRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const startRef = useRef<{ mouse: Position; offset: Position } | undefined>(
+    undefined
+  );
+  const lastMoveRef = useRef<{ x: number; y: number; t: number }>({
+    x: 0,
+    y: 0,
+    t: Date.now(),
+  });
+  const velocityRef = useRef<{ vx: number; vy: number }>({ vx: 0, vy: 0 });
+
+  useEffect(() => {
+    const setInitial = () => {
+      if (!containerRef.current || !draggableRef.current) return;
+      const c = containerRef.current.getBoundingClientRect();
+      const d = draggableRef.current.getBoundingClientRect();
+      // Position card at bottom-left within container
+      const x = 16; // left padding
+      const y = c.height - d.height - 16; // bottom padding
+      setPosition({ x, y });
+    };
+    setInitial();
+    window.addEventListener("resize", setInitial);
+    return () => window.removeEventListener("resize", setInitial);
+  }, []);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    draggableRef.current?.setPointerCapture(e.pointerId);
+    setIsDragging(true);
+    const now = Date.now();
+    startRef.current = {
+      mouse: { x: e.clientX, y: e.clientY },
+      offset: position,
+    };
+    lastMoveRef.current = { x: e.clientX, y: e.clientY, t: now };
+    velocityRef.current = { vx: 0, vy: 0 };
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (
+      !isDragging ||
+      !startRef.current ||
+      !containerRef.current ||
+      !draggableRef.current
+    )
+      return;
+    const { mouse, offset } = startRef.current;
+    const dx = e.clientX - mouse.x;
+    const dy = e.clientY - mouse.y;
+    // Compute velocity
+    const now = Date.now();
+    const dt = now - lastMoveRef.current.t;
+    if (dt > 0) {
+      const vx = (e.clientX - lastMoveRef.current.x) / dt;
+      const vy = (e.clientY - lastMoveRef.current.y) / dt;
+      velocityRef.current = { vx, vy };
+      lastMoveRef.current = { x: e.clientX, y: e.clientY, t: now };
+    }
+    const c = containerRef.current.getBoundingClientRect();
+    const d = draggableRef.current.getBoundingClientRect();
+    let newX = offset.x + dx;
+    let newY = offset.y + dy;
+    // Clamp within container
+    newX = Math.max(0, Math.min(newX, c.width - d.width));
+    newY = Math.max(0, Math.min(newY, c.height - d.height));
+    setPosition({ x: newX, y: newY });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    setIsDragging(false);
+    draggableRef.current?.releasePointerCapture(e.pointerId);
+    // Apply inertia on release
+    if (containerRef.current && draggableRef.current) {
+      const { vx, vy } = velocityRef.current;
+      const multiplier = 200;
+      const c = containerRef.current.getBoundingClientRect();
+      const d = draggableRef.current.getBoundingClientRect();
+      let finalX = position.x + vx * multiplier;
+      let finalY = position.y + vy * multiplier;
+      // Clamp final position
+      finalX = Math.max(0, Math.min(finalX, c.width - d.width));
+      finalY = Math.max(0, Math.min(finalY, c.height - d.height));
+      setPosition({ x: finalX, y: finalY });
+    }
+  };
+
   return (
+    <>
+      <MarqueeBanner
+        message={
+          "GET 15% OFF ON ALL PATTA ITEMS - ADD CODE 'GOTLOVE15' AT CHECKOUT   |   FREE SHIPPING ON EU ORDERS ABOVE €250   |   GET 15% OFF ON ALL PATTA ITEMS - ADD CODE 'GOTLOVE15' AT CHECKOUT   |   FREE SHIPPING ON EU ORDERS ABOVE €250"
+        }
+        className="mb-2"
+      />
     <div>
       <ShopMainSection />
       <NewArrivalsSection products={mockProducts} />
       <VideoSection />
       <LatestFootwearSection products={mockProducts} />
+        {/* Promo Card after Latest Footwear */}
+        <div ref={containerRef} className="relative w-full mt-8 px-0">
+          <div className="relative w-full h-screen max-h-[800px] rounded overflow-hidden">
+            <img
+              src="/images/hero/nike-running-banner.png"
+              alt="Nike Running Banner"
+              className="absolute inset-0 w-full h-full object-cover rounded"
+              style={{ objectFit: "cover" }}
+            />
+            <div
+              ref={draggableRef}
+              className="absolute z-50 cursor-grab"
+              style={{
+                transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
+                touchAction: "none",
+                userSelect: "none",
+                transition: isDragging
+                  ? "none"
+                  : "transform 0.5s cubic-bezier(0.4,0,0.2,1)",
+              }}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+            >
+              <PromoCard
+                imageUrl="/images/products/nike-patta-running-team.jpg"
+                imageAlt="Nike x Patta Running Team"
+                category="NIKE X PATTA RUNNING TEAM"
+                title="Shop now"
+                link="/collections/nike-x-patta-running-team"
+              />
+            </div>
+          </div>
+        </div>
     </div>
+    </>
   );
 }
