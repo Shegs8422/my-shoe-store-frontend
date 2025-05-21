@@ -1,5 +1,5 @@
-// src/app/(pages)/page.tsx
 "use client";
+
 import React, { useRef } from "react";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturedCollection from "@/components/home/FeaturedCollection";

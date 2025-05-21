@@ -7,9 +7,9 @@ import useEmblaCarousel from "embla-carousel-react";
 import type { EmblaOptionsType } from "embla-carousel";
 import Image from "next/image";
 
-import ProductCard from "@/components/product/ProductCard";
-import MouseFollowTooltip from "@/components/common/MouseFollowTooltip";
-import QuickView from "@/components/common/QuickView";
+import ProductCard from "../product/ProductCard";
+import MouseFollowTooltip from "./MouseFollowTooltip";
+import QuickView from "./QuickView";
 import { Product } from "@/types";
 
 interface ProductSliderSectionProps {
