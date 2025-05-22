@@ -1,43 +1,29 @@
 // src/components/layout/Header.tsx
 "use client"; // This component uses hooks and browser APIs
 
-import React, { useState, useEffect, useRef } from "react"; // Import useState for mobile menu
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import MegaMenu from "./MegaMenu"; // Adjust path if needed
+import MobileMenu from "./MobileMenu"; // Import MobileMenu
+import type { NavLink } from "./MobileMenu"; // Import NavLink type
 import { useLenisScroll } from "@/contexts/LenisScrollContext"; // Import the new hook
 import clsx from "clsx";
+import { Globe, Menu } from "lucide-react"; // Import icons from lucide-react
 import "./Header.css";
 
 // --- Placeholder Icons ---
 // TODO: Replace with actual SVG imports or components
-const GlobeIcon = () => (
-  <svg className="w-3 h-3" viewBox="0 0 10 10" fill="currentColor">
-    <circle cx="5" cy="5" r="4.5" />
-  </svg>
-);
-
-const MenuIcon = () => (
-  <svg
-    className="w-6 h-6"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    fill="none"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="3" y1="12" x2="21" y2="12"></line>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <line x1="3" y1="18" x2="21" y2="18"></line>
-  </svg>
-);
 // --- End Placeholder Icons ---
 
 const Header = () => {
+  const { lenis } = useLenisScroll(); // Get Lenis instance
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile
   const [hidden, setHidden] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
+  // const [scrollPosition, setScrollPosition] = useState(0); // Replaced by Lenis
+  const lastScrollY = useRef(0);
+  const slowScrollTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Dropdown state
   const [openDropdown, setOpenDropdown] = useState<
     null | "shop" | "exclusive" | "community" | "ss25"
@@ -51,41 +37,64 @@ const Header = () => {
   const ss25Ref = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    if (!lenis) return;
 
-    const handleScroll = () => {
-      const currentScrollPosition = window.scrollY;
+    const handleLenisScroll = (e: any) => { // Type from Lenis event
+      const currentScrollY = e.scroll;
+      const velocity = e.velocity;
+      const direction = e.direction; // 1 down, -1 up
 
-      if (currentScrollPosition > scrollPosition) {
-        // Scrolling down
+      // Clear any existing slow scroll timer
+      if (slowScrollTimerRef.current) {
+        clearTimeout(slowScrollTimerRef.current);
+        slowScrollTimerRef.current = null;
+      }
+
+      // Rule 1: Always show header if near the top
+      if (currentScrollY < 50) {
+        setHidden(false);
+        lastScrollY.current = currentScrollY;
+        return;
+      }
+
+      // Rule 2: Hide on scroll down
+      if (direction === 1 && currentScrollY > lastScrollY.current && currentScrollY > 200) {
         setHidden(true);
-      } else {
-        // Scrolling up
+      }
+      // Rule 3: Show on scroll up
+      else if (direction === -1 && currentScrollY < lastScrollY.current) {
         setHidden(false);
       }
 
-      setScrollPosition(currentScrollPosition);
-
-      // Clear the timeout if it exists
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      // Rule 4: Show if scrolling stops or is very slow
+      // Only apply if not already shown by scrolling up or being at the top
+      if (Math.abs(velocity) < 0.1 && hidden) { // Check `hidden` to avoid unnecessary sets
+        slowScrollTimerRef.current = setTimeout(() => {
+          // Check again inside timeout if still hidden and velocity is still low
+          // This check might be redundant if lenis events cease on stop,
+          // but good for safety if events continue with low velocity.
+          if (lenis.velocity < 0.1) { // Check current velocity from lenis instance
+             setHidden(false);
+          }
+        }, 300); // Show after 300ms of slow/no scroll
       }
-
-      // Set a timeout to show the header after 3 seconds of inactivity
-      timeoutId = setTimeout(() => {
-        setHidden(false);
-      }, 3000);
+      
+      // Update lastScrollY, but only if change is significant to avoid excessive re-renders
+      // This check might be less critical now as setHidden is the main state update
+      if (Math.abs(currentScrollY - lastScrollY.current) > 5) {
+        lastScrollY.current = currentScrollY;
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    lenis.on("scroll", handleLenisScroll);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      lenis.off("scroll", handleLenisScroll);
+      if (slowScrollTimerRef.current) {
+        clearTimeout(slowScrollTimerRef.current);
       }
     };
-  }, [scrollPosition]);
+  }, [lenis, hidden]); // Add `hidden` to deps: if hidden changes, timer logic might need re-evaluation
 
   // --- Link Data ---
   const shopLinks = [
@@ -216,11 +225,7 @@ const Header = () => {
                       onDropdownMouseEnter={() => setIsHoveringDropdown(true)}
                       onDropdownMouseLeave={() => {
                         setIsHoveringDropdown(false);
-                        setTimeout(() => {
-                          setOpenDropdown((current) =>
-                            current === "shop" ? null : current
-                          );
-                        }, 50);
+                        handleDropdownClose();
                       }}
                     />
                   )}
@@ -243,11 +248,7 @@ const Header = () => {
                       onDropdownMouseEnter={() => setIsHoveringDropdown(true)}
                       onDropdownMouseLeave={() => {
                         setIsHoveringDropdown(false);
-                        setTimeout(() => {
-                          setOpenDropdown((current) =>
-                            current === "exclusive" ? null : current
-                          );
-                        }, 50);
+                        handleDropdownClose();
                       }}
                     />
                   )}
@@ -270,11 +271,7 @@ const Header = () => {
                       onDropdownMouseEnter={() => setIsHoveringDropdown(true)}
                       onDropdownMouseLeave={() => {
                         setIsHoveringDropdown(false);
-                        setTimeout(() => {
-                          setOpenDropdown((current) =>
-                            current === "community" ? null : current
-                          );
-                        }, 50);
+                        handleDropdownClose();
                       }}
                     />
                   )}
@@ -300,11 +297,7 @@ const Header = () => {
                       onDropdownMouseEnter={() => setIsHoveringDropdown(true)}
                       onDropdownMouseLeave={() => {
                         setIsHoveringDropdown(false);
-                        setTimeout(() => {
-                          setOpenDropdown((current) =>
-                            current === "ss25" ? null : current
-                          );
-                        }, 50);
+                        handleDropdownClose();
                       }}
                     />
                   )}
@@ -314,8 +307,8 @@ const Header = () => {
               {/* Utility Navigation */}
               <div className="hidden lg:flex items-center justify-end gap-4 lg:gap-6">
                 <button type="button" className={utilityLinkClasses}>
-                  <span className="relative z-[2]">
-                    <GlobeIcon /> NL/EN
+                  <span className="relative z-[2] flex items-center">
+                    <Globe className="w-3 h-3 mr-1" /> NL/EN
                   </span>
                 </button>
                 <button type="button" className={utilityLinkClasses}>
@@ -341,7 +334,7 @@ const Header = () => {
                 aria-expanded={isMobileMenuOpen}
               >
                 <span className="relative z-[2]">
-                  <MenuIcon />
+                  <Menu className="w-6 h-6" />
                 </span>
               </button>
             </div>
@@ -349,8 +342,14 @@ const Header = () => {
         </div>
       </header>
 
-      {/* TODO: Implement Mobile Menu Drawer Component */}
-      {/* <MobileMenu isOpen={isMobileMenuOpen} onClose={toggleMobileMenu} /> */}
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={toggleMobileMenu}
+        shopLinks={shopLinks}
+        exclusiveLinks={exclusiveLinks}
+        communityLinks={communityLinks}
+        ss25Links={ss25Links}
+      />
     </>
   );
 };
