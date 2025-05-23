@@ -139,9 +139,8 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
       >
         <div className="embla__container">
           {products.map((product, index) => (
-            // Responsive widths using Tailwind classes + padding-right for gap
             <div
-              key={product.id || `product-${index}`}
+              key={`${product.id}-${index}`}
               className="embla__slide pr-3 md:pr-4 lg:pr-5 xl:pr-6 w-10/12 sm:w-1/2 md:w-[40%] lg:w-[30%] xl:w-1/4 2xl:w-1/5"
             >
               <ProductCard
