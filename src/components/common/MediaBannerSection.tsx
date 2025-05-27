@@ -5,6 +5,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import PromoCard from "@/components/home/PromoCard"; // Adjust path
+import { useHeadingAnimation } from "@/hooks/useHeadingAnimation";
 
 interface MediaBannerSectionProps {
   category?: string;
@@ -34,6 +35,8 @@ const MediaBannerSection: React.FC<MediaBannerSectionProps> = ({
   videoSrc,
   promoCard,
 }) => {
+  const headingRef = useHeadingAnimation();
+
   return (
     <section className="relative h-screen min-h-[600px] lg:min-h-[750px] w-full text-white flex flex-col bg-black">
       {/* Background Media */}
@@ -100,7 +103,10 @@ const MediaBannerSection: React.FC<MediaBannerSectionProps> = ({
                 {category}
               </p>
             )}
-            <h3 className="text-primary-medium-3xl lg:text-primary-medium-4xl font-helvetica-black">
+            <h3
+              ref={headingRef}
+              className="text-primary-medium-3xl lg:text-primary-medium-4xl font-helvetica-black section-heading"
+            >
               {/* Basic title, wrap words for animation if needed later */}
               {title}
             </h3>

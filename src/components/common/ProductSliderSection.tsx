@@ -11,6 +11,7 @@ import ProductCard from "../product/ProductCard";
 import MouseFollowTooltip from "./MouseFollowTooltip";
 import QuickView from "./QuickView";
 import { Product } from "@/types";
+import { useHeadingAnimation } from "@/hooks/useHeadingAnimation";
 
 interface ProductSliderSectionProps {
   title: string;
@@ -103,6 +104,8 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
   };
   // --- End Tooltip Event Handlers ---
 
+  const headingRef = useHeadingAnimation();
+
   if (!products || products.length === 0) return null;
 
   return (
@@ -110,7 +113,10 @@ const ProductSliderSection: React.FC<ProductSliderSectionProps> = ({
       {/* Section Header */}
       <header className="mb-6 lg:mb-10">
         <div className="w-full px-4 lg:px-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
-          <h3 className="text-[64px] lg:text-[96px] leading-none tracking-tight font-helvetica-black text-black mb-4 lg:mb-0">
+          <h3
+            ref={headingRef}
+            className="section-heading whitespace-nowrap text-[64px] lg:text-[96px] leading-none tracking-tight font-helvetica-black text-black mb-4 lg:mb-0"
+          >
             {title}
           </h3>
           {/* Desktop Controls: Only View All Button */}
